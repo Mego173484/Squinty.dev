@@ -803,20 +803,6 @@ body.music-playing .volume-bars span:nth-child(6) { animation: barMove 0.22s eas
     font-size: 12px;
 }
 
-.visitor-card {
-    grid-column: 1 / -1;
-}
-
-.visitor-count {
-    display: block;
-    margin: 6px 0 2px 0;
-    color: var(--accent-yellow);
-    font-family: var(--terminal-font);
-    font-size: 24px;
-    font-weight: bold;
-    text-shadow: 0 0 8px var(--green);
-}
-
 .status-light {
     width: 18px;
     height: 18px;
@@ -997,7 +983,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
 <div class="float-line three"></div>
 
 <div class="marquee">
-    <span>squinkyDOS 173484 :: VIDEOS :: MOD NOTES :: MUSIC PLAYER :: OLD COMPUTER MODE</span>
+    <span>squinkyDOS 173484 :: VISITORS <b id="visitorCount">----</b> :: TODAY <b id="visitorToday">--</b> :: VIDEOS :: MOD NOTES :: MUSIC PLAYER :: OLD COMPUTER MODE</span>
 </div>
 
 <div class="desktop-wrap">
@@ -1081,11 +1067,6 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
                     <div class="status-grid">
                         <div class="status-card">OS MODE<div class="status-light"></div>RUNNING</div>
                         <div class="status-card">FILE STATUS<div class="status-light alert"></div>ACTIVE</div>
-                        <div class="status-card visitor-card">
-                            VISITORS
-                            <span class="visitor-count" id="visitorCount">----</span>
-                            <span class="small-text" id="visitorToday">today: --</span>
-                        </div>
                     </div>
                 </div>
             </article>
@@ -1280,12 +1261,12 @@ function recordVisitorCount() {
     })
     .then(function(data) {
         visitorCount.textContent = formatCounterNumber(data.totalCount);
-        visitorToday.textContent = "today: " + formatCounterNumber(data.todayCount || 0);
+        visitorToday.textContent = formatCounterNumber(data.todayCount || 0);
         addLine("VISITOR COUNTER ONLINE: " + formatCounterNumber(data.totalCount) + " TOTAL.");
     })
     .catch(function() {
         visitorCount.textContent = "????";
-        visitorToday.textContent = "today: offline";
+        visitorToday.textContent = "OFFLINE";
         addLine("VISITOR COUNTER OFFLINE.");
     });
 }
