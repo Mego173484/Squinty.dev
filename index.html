@@ -803,6 +803,20 @@ body.music-playing .volume-bars span:nth-child(6) { animation: barMove 0.22s eas
     font-size: 12px;
 }
 
+.visitor-card {
+    grid-column: 1 / -1;
+}
+
+.visitor-count {
+    display: block;
+    margin: 6px 0 2px 0;
+    color: var(--accent-yellow);
+    font-family: var(--terminal-font);
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 0 0 8px var(--green);
+}
+
 .status-light {
     width: 18px;
     height: 18px;
@@ -1067,6 +1081,11 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
                     <div class="status-grid">
                         <div class="status-card">OS MODE<div class="status-light"></div>RUNNING</div>
                         <div class="status-card">FILE STATUS<div class="status-light alert"></div>ACTIVE</div>
+                        <div class="status-card visitor-card">
+                            VISITORS
+                            <span class="visitor-count" id="visitorCount">----</span>
+                            <span class="small-text" id="visitorToday">today: --</span>
+                        </div>
                     </div>
                 </div>
             </article>
@@ -1170,6 +1189,8 @@ const terminalInput = document.getElementById("terminalInput");
 const terminalForm = document.getElementById("terminalForm");
 const record = document.getElementById("record");
 const paletteReadout = document.getElementById("paletteReadout");
+const visitorCount = document.getElementById("visitorCount");
+const visitorToday = document.getElementById("visitorToday");
 
 logoText.split("").forEach(function(letter) {
     const span = document.createElement("span");
@@ -1182,6 +1203,7 @@ const logoLetters = document.querySelectorAll(".logo-letter");
 const notes = [392, 523, 659, 523, 440, 587, 740, 587, 349, 440, 523, 440, 330, 392, 494, 392];
 
 document.getElementById("youtubeFrame").src = "https://www.youtube.com/embed/" + LATEST_VIDEO_ID;
+recordVisitorCount();
 
 enterSiteButton.addEventListener("click", enterSite);
 rebootButton.addEventListener("click", resetOS);
@@ -1236,6 +1258,42 @@ function addLine(text) {
     line.textContent = text;
     terminalOutput.appendChild(line);
     terminalOutput.scrollTop = terminalOutput.scrollHeight;
+}
+
+function recordVisitorCount() {
+    if (!visitorCount || !visitorToday) return;
+
+    fetch("https://visitor.6developer.com/visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            domain: "squinky.dev",
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            page_path: window.location.pathname,
+            page_title: document.title,
+            referrer: document.referrer
+        })
+    })
+    .then(function(response) {
+        if (!response.ok) throw new Error("Visitor counter unavailable");
+        return response.json();
+    })
+    .then(function(data) {
+        visitorCount.textContent = formatCounterNumber(data.totalCount);
+        visitorToday.textContent = "today: " + formatCounterNumber(data.todayCount || 0);
+        addLine("VISITOR COUNTER ONLINE: " + formatCounterNumber(data.totalCount) + " TOTAL.");
+    })
+    .catch(function() {
+        visitorCount.textContent = "????";
+        visitorToday.textContent = "today: offline";
+        addLine("VISITOR COUNTER OFFLINE.");
+    });
+}
+
+function formatCounterNumber(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return "0";
+    return number.toLocaleString("en-US");
 }
 
 function runCommand(rawCommand) {
