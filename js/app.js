@@ -87,8 +87,6 @@ let warpTimer = null;
 let screensaverTimer = null;
 let systemEventTimer = null;
 let dynamicReadoutTimer = null;
-let depthFrame = null;
-let latestPointerEvent = null;
 let cachedBorderWidth = 0;
 let cachedBorderHeight = 0;
 let lastBorderDrawTime = 0;
@@ -161,13 +159,16 @@ logoText.split("").forEach(function(letter) {
     const span = document.createElement("span");
     span.className = "logo-letter";
     span.textContent = letter;
+    span.tabIndex = 0;
+    span.setAttribute("role", "button");
+    span.setAttribute("aria-label", "Play " + letter);
     logo.appendChild(span);
 });
 
-const logoLetters = document.querySelectorAll(".logo-letter");
 const themeExtra = document.createElement("span");
 themeExtra.className = "theme-extra";
 subtitle.appendChild(themeExtra);
+const logoLetters = document.querySelectorAll(".logo-letter");
 const notes = [392, 523, 659, 523, 440, 587, 740, 587, 349, 440, 523, 440, 330, 392, 494, 392];
 
 themes.forEach(function(theme, index) {
@@ -202,6 +203,16 @@ document.getElementById("warpButton").addEventListener("click", startRealityWarp
 document.getElementById("colorButton").addEventListener("click", cycleTheme);
 document.getElementById("resetButton").addEventListener("click", resetOS);
 document.getElementById("terminateButton").addEventListener("click", terminateOS);
+
+logoLetters.forEach(function(letter, index) {
+    letter.addEventListener("click", function() { playLogoKey(index); });
+    letter.addEventListener("keydown", function(event) {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            playLogoKey(index);
+        }
+    });
+});
 
 document.querySelectorAll("[data-window]").forEach(function(button) {
     button.addEventListener("click", function() { focusWindow(button.dataset.window); });
@@ -243,7 +254,6 @@ terminalForm.addEventListener("submit", function(event) {
 
 guestbookForm.addEventListener("submit", submitGuestbookEntry);
 
-document.addEventListener("mousemove", updateDepthFromPointer, { passive: true });
 document.addEventListener("click", makeClickSpark);
 document.addEventListener("visibilitychange", handleVisibilityChange);
 ["mousemove", "mousedown", "keydown", "touchstart", "scroll"].forEach(function(eventName) {
@@ -850,32 +860,6 @@ function setFilePreview(text) {
     filePreview.textContent = text;
 }
 
-// Parallax and depth effects
-function updateDepthFromPointer(event) {
-    if (screensaverActive || window.innerWidth <= 820) return;
-
-    latestPointerEvent = event;
-
-    if (depthFrame) return;
-
-    depthFrame = requestAnimationFrame(applyDepthFromPointer);
-}
-
-function applyDepthFromPointer() {
-    depthFrame = null;
-    if (!latestPointerEvent) return;
-
-    const width = window.innerWidth || 1;
-    const height = window.innerHeight || 1;
-    const x = (latestPointerEvent.clientX / width - 0.5);
-    const y = (latestPointerEvent.clientY / height - 0.5);
-
-    document.documentElement.style.setProperty("--parallax-x", (x * 18).toFixed(2) + "px");
-    document.documentElement.style.setProperty("--parallax-y", (y * 14).toFixed(2) + "px");
-    document.documentElement.style.setProperty("--tilt-y", (x * 2.2).toFixed(2) + "deg");
-    document.documentElement.style.setProperty("--tilt-x", (y * -1.6).toFixed(2) + "deg");
-}
-
 // Page driver loading
 function loadPage(pageId) {
     noteUserActivity();
@@ -1194,9 +1178,41 @@ function playDriverBootSound() {
 }
 
 function bounceLetter() {
-    const letter = logoLetters[step % logoLetters.length];
-    letter.classList.add("bounce");
-    setTimeout(function() { letter.classList.remove("bounce"); }, 135);
+    const primaryIndex = step % logoLetters.length;
+    bounceLogoLetter(primaryIndex, "bounce");
+
+    if (step % 2 === 0) {
+        bounceLogoLetter((primaryIndex + 3) % logoLetters.length, "bounce-soft");
+    }
+
+    if (step % 4 === 0) {
+        bounceLogoLetter((primaryIndex + 7) % logoLetters.length, "bounce-wide");
+    }
+}
+
+function bounceLogoLetter(index, className) {
+    const letter = logoLetters[index];
+    if (!letter) return;
+
+    letter.classList.remove("bounce", "bounce-soft", "bounce-wide");
+    void letter.offsetWidth;
+    letter.classList.add(className);
+
+    setTimeout(function() {
+        letter.classList.remove(className);
+    }, 145);
+}
+
+function playLogoKey(index) {
+    if (!ensureAudio()) return;
+
+    const note = notes[index % notes.length];
+    playNote(note, 0.16);
+    bounceLogoLetter(index, "bounce-wide");
+
+    if (!isPlaying) {
+        addLine("LOGO KEY: " + logoLetters[index].textContent + " " + Math.round(note) + "HZ.");
+    }
 }
 
 function pulseRecord() {
