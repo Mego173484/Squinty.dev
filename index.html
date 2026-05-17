@@ -597,6 +597,18 @@ body:not(.warping) .window:hover {
     box-shadow: 8px 8px 0 rgba(0,0,0,0.45), 0 0 24px var(--green), 0 0 38px rgba(77,255,223,0.55);
 }
 
+.window.minimized .window-content {
+    display: none;
+}
+
+.window.minimized {
+    opacity: 0.82;
+}
+
+.window.hidden-window {
+    display: none;
+}
+
 .titlebar {
     display: flex;
     justify-content: space-between;
@@ -617,6 +629,13 @@ body:not(.warping) .window:hover {
     height: 14px;
     border: 2px outset #dffff5;
     background: var(--accent-yellow);
+    cursor: pointer;
+    padding: 0;
+}
+
+.fake-button:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
 }
 .fake-button.green { background: var(--green); }
 .fake-button.blue { background: var(--blue); }
@@ -995,6 +1014,47 @@ body.music-playing .volume-bars span:nth-child(6) { animation: barMove 0.22s eas
     text-align: center;
 }
 
+.screensaver {
+    position: fixed;
+    inset: 0;
+    z-index: 9500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background:
+        repeating-linear-gradient(to bottom, rgba(255,255,255,0.04), rgba(255,255,255,0.04) 1px, transparent 1px, transparent 5px),
+        radial-gradient(circle at center, rgba(44,255,106,0.13), transparent 34%),
+        rgba(0, 7, 4, 0.94);
+}
+
+.screensaver.visible {
+    display: flex;
+}
+
+.screensaver-logo {
+    color: var(--green);
+    font-size: clamp(42px, 11vw, 116px);
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 0 18px var(--green), 0 0 48px var(--cyan), 3px 3px 0 #00130d;
+    animation: saverDrift 9s ease-in-out infinite alternate, startupLogoPulse 1.8s ease-in-out infinite alternate;
+}
+
+.screensaver-text {
+    position: absolute;
+    bottom: 10%;
+    color: #dffff5;
+    font-family: var(--terminal-font);
+    font-size: 13px;
+    text-align: center;
+}
+
+@keyframes saverDrift {
+    from { transform: translate(-18vw, -10vh) rotate(-2deg); }
+    to { transform: translate(18vw, 12vh) rotate(2deg); }
+}
+
 body.warping .desktop {
     animation: desktopWarp 0.34s ease-in-out infinite alternate;
     filter: hue-rotate(25deg) saturate(1.25);
@@ -1167,6 +1227,11 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
     </div>
 </div>
 
+<div class="screensaver" id="screensaver">
+    <div class="screensaver-logo">SQUINKY.DEV</div>
+    <div class="screensaver-text">screensaver active<br>move / tap / press any key to return</div>
+</div>
+
 <div class="wallpaper"></div>
 <div class="float-line one"></div>
 <div class="float-line two"></div>
@@ -1208,7 +1273,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
             <article class="window" id="videoWindow">
                 <div class="titlebar">
                     <span>LATEST_VIDEO.URL</span>
-                    <span class="window-buttons"><span class="fake-button green"></span><span class="fake-button blue"></span><span class="fake-button"></span></span>
+                    <span class="window-buttons"><button class="fake-button green" type="button" data-window-action="focus" aria-label="Focus window"></button><button class="fake-button blue" type="button" data-window-action="minimize" aria-label="Collapse window"></button><button class="fake-button" type="button" data-window-action="close" aria-label="Close window"></button></span>
                 </div>
                 <div class="window-content">
                     <h2>Latest Upload</h2>
@@ -1223,7 +1288,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
             <article class="window" id="musicWindow">
                 <div class="titlebar">
                     <span>MUSIC_PLAYER.EXE</span>
-                    <span class="window-buttons"><span class="fake-button green"></span><span class="fake-button blue"></span><span class="fake-button"></span></span>
+                    <span class="window-buttons"><button class="fake-button green" type="button" data-window-action="focus" aria-label="Focus window"></button><button class="fake-button blue" type="button" data-window-action="minimize" aria-label="Collapse window"></button><button class="fake-button" type="button" data-window-action="close" aria-label="Close window"></button></span>
                 </div>
                 <div class="window-content">
                     <h2>Music Player</h2>
@@ -1245,7 +1310,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
             <article class="window" id="aboutWindow">
                 <div class="titlebar">
                     <span>ABOUT_THIS_PLACE.TXT</span>
-                    <span class="window-buttons"><span class="fake-button green"></span><span class="fake-button blue"></span><span class="fake-button"></span></span>
+                    <span class="window-buttons"><button class="fake-button green" type="button" data-window-action="focus" aria-label="Focus window"></button><button class="fake-button blue" type="button" data-window-action="minimize" aria-label="Collapse window"></button><button class="fake-button" type="button" data-window-action="close" aria-label="Close window"></button></span>
                 </div>
                 <div class="window-content">
                     <h2>About</h2>
@@ -1267,7 +1332,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
             <article class="window" id="modWindow">
                 <div class="titlebar">
                     <span>FALLEN_GRACE_MOD_TRACKER.EXE</span>
-                    <span class="window-buttons"><span class="fake-button green"></span><span class="fake-button blue"></span><span class="fake-button"></span></span>
+                    <span class="window-buttons"><button class="fake-button green" type="button" data-window-action="focus" aria-label="Focus window"></button><button class="fake-button blue" type="button" data-window-action="minimize" aria-label="Collapse window"></button><button class="fake-button" type="button" data-window-action="close" aria-label="Close window"></button></span>
                 </div>
                 <div class="window-content">
                     <h2>Mod Tracker</h2>
@@ -1287,7 +1352,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
             <article class="window" id="fileWindow">
                 <div class="titlebar">
                     <span>LOCAL_DISK_A.DAT</span>
-                    <span class="window-buttons"><span class="fake-button green"></span><span class="fake-button blue"></span><span class="fake-button"></span></span>
+                    <span class="window-buttons"><button class="fake-button green" type="button" data-window-action="focus" aria-label="Focus window"></button><button class="fake-button blue" type="button" data-window-action="minimize" aria-label="Collapse window"></button><button class="fake-button" type="button" data-window-action="close" aria-label="Close window"></button></span>
                 </div>
                 <div class="window-content">
                     <h2>File System</h2>
@@ -1307,7 +1372,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
             <article class="window" id="terminalWindow">
                 <div class="titlebar">
                     <span>SQUINK_TERMINAL.BAT</span>
-                    <span class="window-buttons"><span class="fake-button green"></span><span class="fake-button blue"></span><span class="fake-button"></span></span>
+                    <span class="window-buttons"><button class="fake-button green" type="button" data-window-action="focus" aria-label="Focus window"></button><button class="fake-button blue" type="button" data-window-action="minimize" aria-label="Collapse window"></button><button class="fake-button" type="button" data-window-action="close" aria-label="Close window"></button></span>
                 </div>
                 <div class="window-content">
                     <div class="terminal-screen" id="terminalOutput">
@@ -1354,6 +1419,7 @@ const LATEST_VIDEO_ID = "BBib-8NMGP8";
 const DOS_VERSION = "173484";
 const VISITOR_BASE = 173484;
 const VISITOR_STORAGE_KEY = "squinky.dev.localVisits";
+const SCREENSAVER_DELAY = 60000;
 
 // Boot and flavor text pools
 const bootLinePool = [
@@ -1400,6 +1466,8 @@ let isPlaying = false;
 let borderBoost = 32;
 let themeIndex = 0;
 let warpTimer = null;
+let screensaverTimer = null;
+let screensaverActive = false;
 let isTerminated = false;
 let currentSplash = "";
 
@@ -1414,6 +1482,7 @@ const themes = [
 // DOM references
 const startupScreen = document.getElementById("startupScreen");
 const terminatedScreen = document.getElementById("terminatedScreen");
+const screensaver = document.getElementById("screensaver");
 const enterSiteButton = document.getElementById("enterSiteButton");
 const rebootButton = document.getElementById("rebootButton");
 const bootLines = document.getElementById("bootLines");
@@ -1469,6 +1538,13 @@ document.querySelectorAll("[data-window]").forEach(function(button) {
     button.addEventListener("click", function() { focusWindow(button.dataset.window); });
 });
 
+document.querySelectorAll("[data-window-action]").forEach(function(button) {
+    button.addEventListener("click", function(event) {
+        event.stopPropagation();
+        handleWindowAction(button.closest(".window"), button.dataset.windowAction);
+    });
+});
+
 document.querySelectorAll("[data-command]").forEach(function(button) {
     button.addEventListener("click", function() { runCommand(button.dataset.command); });
 });
@@ -1489,6 +1565,10 @@ terminalForm.addEventListener("submit", function(event) {
 });
 
 document.addEventListener("mousemove", updateDepthFromPointer);
+["mousemove", "mousedown", "keydown", "touchstart", "scroll"].forEach(function(eventName) {
+    document.addEventListener(eventName, noteUserActivity, { passive: true });
+});
+resetScreensaverTimer();
 
 // Audio setup and OS entry
 function ensureAudio() {
@@ -1498,6 +1578,7 @@ function ensureAudio() {
 
 function enterSite() {
     if (isTerminated) return;
+    noteUserActivity();
     ensureAudio();
     playStartupFanfare();
     startupScreen.classList.add("hidden");
@@ -1512,6 +1593,35 @@ function addLine(text) {
     line.textContent = text;
     terminalOutput.appendChild(line);
     terminalOutput.scrollTop = terminalOutput.scrollHeight;
+}
+
+// Screensaver and activity tracking
+function noteUserActivity() {
+    if (screensaverActive) {
+        hideScreensaver();
+    }
+
+    resetScreensaverTimer();
+}
+
+function resetScreensaverTimer() {
+    clearTimeout(screensaverTimer);
+
+    if (isTerminated) return;
+
+    screensaverTimer = setTimeout(showScreensaver, SCREENSAVER_DELAY);
+}
+
+function showScreensaver() {
+    if (isTerminated || !startupScreen.classList.contains("hidden")) return;
+
+    screensaverActive = true;
+    screensaver.classList.add("visible");
+}
+
+function hideScreensaver() {
+    screensaverActive = false;
+    screensaver.classList.remove("visible");
 }
 
 // Startup, splash, and local visit counter
@@ -1624,7 +1734,7 @@ function runCommand(rawCommand) {
     addLine("SQUINK> " + rawCommand.toUpperCase());
 
     if (command === "help") {
-        addLine("COMMANDS: HELP, VIDEO, MOD, MUSIC, ABOUT, FILES, SQUINK, COLOR, WAVE, SPLASH, STATUS, DIR, OPEN README, OPEN SIGNALS, VERSION, SITE, RESET, REBOOT, TERMINATE, SHUTDOWN, CLEAR");
+        addLine("COMMANDS: HELP, VIDEO, MOD, MUSIC, ABOUT, FILES, SQUINK, COLOR, WAVE, SPLASH, STATUS, DIR, OPEN README, OPEN SIGNALS, VERSION, SITE, SAVER, RESET, REBOOT, TERMINATE, SHUTDOWN, CLEAR");
     } else if (command === "video") {
         focusWindow("videoWindow");
         addLine("OPENED LATEST_VIDEO.URL.");
@@ -1660,6 +1770,9 @@ function runCommand(rawCommand) {
         addLine("squinkyDOS VERSION " + DOS_VERSION + ".");
     } else if (command === "site") {
         addLine("squinky.dev");
+    } else if (command === "saver" || command === "screensaver") {
+        addLine("SCREENSAVER ARMED.");
+        showScreensaver();
     } else if (command === "wave") {
         borderBoost = 54;
         addLine("WAVE BORDER AMPLIFIER: HIGH.");
@@ -1740,6 +1853,8 @@ function setFilePreview(text) {
 
 // Parallax and depth effects
 function updateDepthFromPointer(event) {
+    if (screensaverActive) return;
+
     const width = window.innerWidth || 1;
     const height = window.innerHeight || 1;
     const x = (event.clientX / width - 0.5);
@@ -1752,10 +1867,30 @@ function updateDepthFromPointer(event) {
 }
 
 // Window focus and theme controls
+function handleWindowAction(windowElement, action) {
+    if (!windowElement) return;
+
+    if (action === "focus") {
+        focusWindow(windowElement.id);
+        windowElement.classList.remove("minimized");
+        addLine("WINDOW FOCUSED: " + windowElement.id.toUpperCase() + ".");
+    } else if (action === "minimize") {
+        windowElement.classList.toggle("minimized");
+        windowElement.classList.remove("hidden-window");
+        windowElement.classList.add("active");
+        addLine("WINDOW " + (windowElement.classList.contains("minimized") ? "COLLAPSED" : "EXPANDED") + ": " + windowElement.id.toUpperCase() + ".");
+    } else if (action === "close") {
+        windowElement.classList.add("hidden-window");
+        windowElement.classList.remove("active");
+        addLine("WINDOW CLOSED: " + windowElement.id.toUpperCase() + ".");
+    }
+}
+
 function focusWindow(id) {
     const target = document.getElementById(id);
     if (!target) return;
     document.querySelectorAll(".window").forEach(function(win) { win.classList.remove("active"); });
+    target.classList.remove("hidden-window", "minimized");
     target.classList.add("active");
     target.scrollIntoView({ behavior: "smooth", block: "center" });
 }
@@ -1791,6 +1926,7 @@ function resetOS() {
     ensureAudio();
     playResetSound();
     stopMusic();
+    hideScreensaver();
     document.body.classList.remove("music-playing", "warping");
     terminatedScreen.classList.remove("visible");
     startupScreen.classList.remove("hidden");
@@ -1804,12 +1940,15 @@ function resetOS() {
     terminalOutput.innerHTML = "";
     addLine("RESETTING SQUINKYDOS...");
     addLine("VERSION 173484 WAITING FOR START.");
+    resetScreensaverTimer();
 }
 
 function terminateOS() {
     ensureAudio();
     playTerminateSound();
     stopMusic();
+    hideScreensaver();
+    clearTimeout(screensaverTimer);
     document.body.classList.remove("music-playing", "warping");
     startupScreen.classList.add("hidden");
     terminatedScreen.classList.add("visible");
