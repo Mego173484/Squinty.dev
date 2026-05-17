@@ -1506,6 +1506,26 @@ body.dance-party .desktop-icon {
         to { transform: translate(1px, 2px); }
     }
 }
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    body:not(.warping) .desktop {
+        transform: none;
+    }
+
+    .screensaver::before,
+    .screensaver::after {
+        opacity: 0.22;
+    }
+}
 </style>
 </head>
 <body>
@@ -1867,6 +1887,10 @@ let warpTimer = null;
 let screensaverTimer = null;
 let systemEventTimer = null;
 let dynamicReadoutTimer = null;
+let depthFrame = null;
+let latestPointerEvent = null;
+let cachedBorderWidth = 0;
+let cachedBorderHeight = 0;
 let screensaverActive = false;
 let isTerminated = false;
 let currentSplash = "";
@@ -1982,10 +2006,21 @@ terminalForm.addEventListener("submit", function(event) {
 
 document.addEventListener("mousemove", updateDepthFromPointer);
 document.addEventListener("click", makeClickSpark);
+document.addEventListener("visibilitychange", handleVisibilityChange);
 ["mousemove", "mousedown", "keydown", "touchstart", "scroll"].forEach(function(eventName) {
     document.addEventListener(eventName, noteUserActivity, { passive: true });
 });
 resetScreensaverTimer();
+
+function handleVisibilityChange() {
+    if (document.hidden) {
+        cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+    } else {
+        startWaveBorder();
+        updateDynamicReadouts();
+    }
+}
 
 // Audio setup and OS entry
 function ensureAudio() {
@@ -2361,10 +2396,21 @@ function setFilePreview(text) {
 function updateDepthFromPointer(event) {
     if (screensaverActive) return;
 
+    latestPointerEvent = event;
+
+    if (depthFrame) return;
+
+    depthFrame = requestAnimationFrame(applyDepthFromPointer);
+}
+
+function applyDepthFromPointer() {
+    depthFrame = null;
+    if (!latestPointerEvent) return;
+
     const width = window.innerWidth || 1;
     const height = window.innerHeight || 1;
-    const x = (event.clientX / width - 0.5);
-    const y = (event.clientY / height - 0.5);
+    const x = (latestPointerEvent.clientX / width - 0.5);
+    const y = (latestPointerEvent.clientY / height - 0.5);
 
     document.documentElement.style.setProperty("--parallax-x", (x * 18).toFixed(2) + "px");
     document.documentElement.style.setProperty("--parallax-y", (y * 14).toFixed(2) + "px");
@@ -2755,8 +2801,10 @@ function stopMusic() {
 // Wave border visualizer
 function resizeBorderCanvas() {
     const rect = wrap.getBoundingClientRect();
-    borderCanvas.width = rect.width + 68;
-    borderCanvas.height = rect.height + 68;
+    cachedBorderWidth = Math.round(rect.width + 68);
+    cachedBorderHeight = Math.round(rect.height + 68);
+    borderCanvas.width = cachedBorderWidth;
+    borderCanvas.height = cachedBorderHeight;
 }
 
 window.addEventListener("resize", resizeBorderCanvas);
@@ -2788,9 +2836,8 @@ function drawWaveLine(startX, startY, endX, endY, outwardX, outwardY, dataArray,
 
 function drawWaveBorder() {
     animationFrame = requestAnimationFrame(drawWaveBorder);
-    resizeBorderCanvas();
-    const width = borderCanvas.width;
-    const height = borderCanvas.height;
+    const width = cachedBorderWidth || borderCanvas.width;
+    const height = cachedBorderHeight || borderCanvas.height;
     const padding = 28;
     borderCtx.clearRect(0, 0, width, height);
 
