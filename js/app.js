@@ -222,15 +222,16 @@ function handleVisibilityChange() {
 
 // Audio setup and OS entry
 function ensureAudio() {
+    if (!window.AudioContext && !window.webkitAudioContext) return false;
     if (!audioCtx) setupAudio();
     if (audioCtx.state === "suspended") audioCtx.resume();
+    return true;
 }
 
 function enterSite() {
     if (isTerminated) return;
     noteUserActivity();
-    ensureAudio();
-    playStartupFanfare();
+    if (ensureAudio()) playStartupFanfare();
     startupScreen.classList.add("hidden");
     startupScreen.classList.remove("visible");
     addLine("SQUINKYDOS FANFARE COMPLETE.");
@@ -487,7 +488,7 @@ function submitGuestbookEntry(event) {
         body: JSON.stringify({ name: name, message: message })
     })
     .then(function(response) {
-        return response.json().then(function(data) {
+        return readGuestbookResponse(response).then(function(data) {
             if (!response.ok) {
                 throw new Error(data.error || "Guestbook rejected signal");
             }
@@ -501,8 +502,32 @@ function submitGuestbookEntry(event) {
         addLine("GUESTBOOK SIGNAL SAVED.");
     })
     .catch(function(error) {
-        setGuestbookStatus("SIGNAL FAILED: " + error.message.toUpperCase() + ".");
+        setGuestbookStatus("SIGNAL FAILED: " + getGuestbookErrorMessage(error).toUpperCase() + ".");
     });
+}
+
+function readGuestbookResponse(response) {
+    const contentType = response.headers.get("Content-Type") || "";
+
+    if (contentType.indexOf("application/json") !== -1) {
+        return response.json();
+    }
+
+    if (!response.ok) {
+        return Promise.resolve({ error: "Guestbook API unavailable" });
+    }
+
+    return response.json().catch(function() {
+        return {};
+    });
+}
+
+function getGuestbookErrorMessage(error) {
+    if (!error || !error.message || error.message === "Failed to fetch") {
+        return "Guestbook API unavailable";
+    }
+
+    return error.message;
 }
 
 function randomInt(min, max) {
@@ -826,8 +851,7 @@ function showThemeFlash(message) {
 
 // OS lifecycle controls
 function resetOS() {
-    ensureAudio();
-    playResetSound();
+    if (ensureAudio()) playResetSound();
     stopMusic();
     hideScreensaver();
     clearTimeout(systemEventTimer);
@@ -851,8 +875,7 @@ function resetOS() {
 }
 
 function terminateOS() {
-    ensureAudio();
-    playTerminateSound();
+    if (ensureAudio()) playTerminateSound();
     stopMusic();
     hideScreensaver();
     clearTimeout(screensaverTimer);
@@ -869,8 +892,7 @@ function terminateOS() {
 // Squink Warp effect
 function startRealityWarp() {
     clearTimeout(warpTimer);
-    ensureAudio();
-    playWarpSound();
+    if (ensureAudio()) playWarpSound();
     document.body.classList.add("warping");
     borderBoost = 62;
     addLine("SQUINK WARP STARTED.");
@@ -898,7 +920,11 @@ function makeSquinkNote() {
 
 // Music player loop
 function toggleMusic() {
-    ensureAudio();
+    if (!ensureAudio()) {
+        addLine("AUDIO DRIVER UNAVAILABLE.");
+        return;
+    }
+
     if (!isPlaying) {
         startMusic();
         isPlaying = true;
@@ -918,7 +944,8 @@ function toggleMusic() {
 
 // Audio synthesis
 function setupAudio() {
-    audioCtx = new AudioContext();
+    const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContextConstructor();
     analyser = audioCtx.createAnalyser();
     analyser.fftSize = 1024;
     analyser.smoothingTimeConstant = 0.25;
@@ -1000,7 +1027,7 @@ function playTerminateSound() {
 }
 
 function playDriverBootSound() {
-    ensureAudio();
+    if (!ensureAudio()) return;
 
     const now = audioCtx.currentTime;
     const tones = [
