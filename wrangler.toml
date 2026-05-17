@@ -1,0 +1,12 @@
+name = "squinky-dev-api"
+main = "api/worker.mjs"
+compatibility_date = "2026-05-17"
+
+# After creating the KV namespace, replace these IDs.
+[[kv_namespaces]]
+binding = "GUESTBOOK"
+id = "REPLACE_WITH_PRODUCTION_KV_ID"
+preview_id = "REPLACE_WITH_PREVIEW_KV_ID"
+
+# Deploy this Worker on the route:
+# squinky.dev/api/*

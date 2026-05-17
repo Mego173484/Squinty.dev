@@ -191,6 +191,7 @@
                         <li><button class="file-row" type="button" data-file="VIDEO"><span>VIDEO</span><span class="file-type">DIR</span></button></li>
                         <li><button class="file-row" type="button" data-file="MUSIC"><span>MUSIC</span><span class="file-type">DIR</span></button></li>
                         <li><button class="file-row" type="button" data-file="SIGNALS"><span>SIGNALS</span><span class="file-type">DIR</span></button></li>
+                        <li><button class="file-row" type="button" data-file="GUESTBOOK"><span>GUESTBOOK.TXT</span><span class="file-type">TXT</span></button></li>
                         <li><button class="file-row" type="button" data-file="README"><span>README.TXT</span><span class="file-type">TXT</span></button></li>
                     </ul>
                     <div class="file-preview" id="filePreview">SELECT FILE FROM A:/</div>
@@ -223,6 +224,7 @@
                         <button class="os-button quick-command" data-command="color">color</button>
                         <button class="os-button quick-command" data-command="squink">squink</button>
                         <button class="os-button quick-command" data-command="splash">splash</button>
+                        <button class="os-button quick-command" data-command="guestbook">guestbook</button>
                         <button class="os-button quick-command" data-command="scan">scan</button>
                         <button class="os-button quick-command" data-command="reset">reset</button>
                         <button class="os-button quick-command" data-command="terminate">terminate</button>
@@ -334,6 +336,11 @@
     </div>
 </section>
 
+<script>
+if (location.protocol === "file:" || location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    window.SQUINKY_API_BASE = "http://127.0.0.1:8787/api";
+}
+</script>
 <script src="js/app.js"></script>
 </body>
 </html>

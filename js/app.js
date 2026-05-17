@@ -409,10 +409,13 @@ function hasBlockedWords(text) {
 }
 
 function setGuestbookStatus(message) {
+    if (!guestbookStatus) return;
     guestbookStatus.textContent = message;
 }
 
 function loadGuestbook() {
+    if (!guestbookList) return;
+
     setGuestbookStatus("READING GUESTBOOK DISK...");
 
     fetch(API_BASE + "/guestbook")
@@ -525,7 +528,7 @@ function runCommand(rawCommand) {
     addLine("SQUINK> " + rawCommand.toUpperCase());
 
     if (command === "help") {
-        addLine("COMMANDS: HELP, VIDEO, VIDEOS, GALLERY, HOME, MOD, MUSIC, ABOUT, FILES, SQUINK, COLOR, WAVE, SPLASH, STATUS, DIR, OPEN README, OPEN SIGNALS, VERSION, SITE, SCAN, GLOW, DANCE, SAVER, RESET, REBOOT, TERMINATE, SHUTDOWN, CLEAR");
+        addLine("COMMANDS: HELP, VIDEO, VIDEOS, GALLERY, GUESTBOOK, HOME, MOD, MUSIC, ABOUT, FILES, SQUINK, COLOR, WAVE, SPLASH, STATUS, DIR, OPEN README, OPEN SIGNALS, VERSION, SITE, SCAN, GLOW, DANCE, SAVER, RESET, REBOOT, TERMINATE, SHUTDOWN, CLEAR");
     } else if (command === "video") {
         focusWindow("videoWindow");
         addLine("OPENED LATEST_VIDEO.URL.");
@@ -533,6 +536,8 @@ function runCommand(rawCommand) {
         loadPage("videosPage");
     } else if (command === "gallery") {
         loadPage("galleryPage");
+    } else if (command === "guestbook") {
+        loadPage("guestbookPage");
     } else if (command === "home") {
         loadPage("homePage");
     } else if (command === "mod") {
@@ -611,6 +616,7 @@ function printDirectory() {
     addLine("VIDEO/");
     addLine("MUSIC/");
     addLine("SIGNALS/");
+    addLine("GUESTBOOK.TXT");
     addLine("README.TXT");
 }
 
@@ -671,6 +677,11 @@ function openFile(fileName) {
             setFilePreview("SIGNALS/: green signal steady. Iterator link unstable, harmless, and slightly warm.");
             addLine("A:/SIGNALS OPENED. GREEN SIGNAL STEADY.");
         },
+        GUESTBOOK: function() {
+            setFilePreview("GUESTBOOK.TXT: visitor signals are routed through the no-cursing filter before they are saved.");
+            loadPage("guestbookPage");
+            addLine("GUESTBOOK.TXT OPENED. FILTER STATUS: ACTIVE.");
+        },
         README: function() {
             setFilePreview("README.TXT: squinky.dev is a personal web disk for videos, mod notes, music, and experiments.");
             addLine("README.TXT OPENED.");
@@ -727,7 +738,8 @@ function loadPage(pageId) {
     const labels = {
         homePage: "DESKTOP DRIVER",
         videosPage: "VIDEO DRIVER",
-        galleryPage: "GALLERY DRIVER"
+        galleryPage: "GALLERY DRIVER",
+        guestbookPage: "GUESTBOOK DRIVER"
     };
 
     driverTitle.textContent = "LOADING " + (labels[pageId] || "PAGE DRIVER");
@@ -742,6 +754,7 @@ function loadPage(pageId) {
         });
 
         driverLoader.classList.remove("visible");
+        if (pageId === "guestbookPage") loadGuestbook();
         resizeBorderCanvas();
         addLine("PAGE DRIVER LOADED: " + (labels[pageId] || pageId).toUpperCase() + ".");
         window.scrollTo({ top: 0, behavior: "smooth" });
