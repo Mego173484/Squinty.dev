@@ -250,17 +250,24 @@ body::after {
         radial-gradient(circle at 20% 25%, rgba(44,255,106,0.16), transparent 18%),
         radial-gradient(circle at 70% 35%, rgba(45,140,255,0.16), transparent 20%),
         radial-gradient(circle at center, var(--wall-a) 0%, var(--wall-b) 48%, var(--wall-c) 100%);
-    animation: wallpaperPulse 18s ease-in-out infinite alternate;
+    background-size: 100% 100%, 100% 100%, 100% 100%;
 }
 
 .wallpaper::before {
     content: "";
     position: absolute;
-    inset: -20%;
-    background-image: linear-gradient(rgba(77,255,223,0.13) 2px, transparent 2px), linear-gradient(90deg, rgba(44,255,106,0.13) 2px, transparent 2px);
-    background-size: 74px 74px;
-    transform: rotate(-2deg);
-    animation: gridDrift 14s linear infinite;
+    left: -12%;
+    right: -12%;
+    bottom: -8%;
+    height: 58%;
+    background-image:
+        linear-gradient(rgba(77,255,223,0.22) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(44,255,106,0.2) 2px, transparent 2px);
+    background-size: 86px 34px;
+    transform: skewY(-4deg) translate3d(0, -34px, 0);
+    transform-origin: bottom center;
+    will-change: transform;
+    animation: floorDrift 3.8s linear infinite;
 }
 
 .wallpaper::after {
@@ -272,14 +279,9 @@ body::after {
     pointer-events: none;
 }
 
-@keyframes gridDrift {
-    from { background-position: 0 0; }
-    to { background-position: 74px 74px; }
-}
-
-@keyframes wallpaperPulse {
-    from { filter: brightness(0.92) saturate(1); }
-    to { filter: brightness(1.08) saturate(1.16); }
+@keyframes floorDrift {
+    from { transform: skewY(-4deg) translate3d(0, -34px, 0); }
+    to { transform: skewY(-4deg) translate3d(0, 0, 0); }
 }
 
 .float-line {
@@ -587,13 +589,31 @@ h1 {
 
 .logo-letter {
     display: inline-block;
-    transition: transform 0.08s, color 0.08s;
+    border: 0;
+    outline-offset: 5px;
+    cursor: pointer;
+    transition: transform 0.08s, color 0.08s, text-shadow 0.08s;
 }
 
 .logo-letter.bounce {
     transform: translateY(-18px) scale(1.14) rotate(-4deg);
     color: white;
     text-shadow: 0 0 10px white, 0 0 24px var(--green), 0 0 40px var(--cyan);
+}
+
+.logo-letter.bounce-soft {
+    transform: translateY(-10px) scale(1.08);
+    color: var(--accent-yellow);
+}
+
+.logo-letter.bounce-wide {
+    transform: translateY(-22px) scale(1.22) rotate(3deg);
+    color: #ffffff;
+    text-shadow: 0 0 12px white, 0 0 30px var(--accent-yellow), 0 0 48px var(--cyan);
+}
+
+.logo-letter:focus-visible {
+    outline: 2px solid var(--accent-yellow);
 }
 
 .subtitle {
@@ -1921,6 +1941,7 @@ body.dance-party .desktop-icon {
     }
 
     .wallpaper::before,
+    .wallpaper,
     .float-line {
         animation: none;
     }
@@ -1971,7 +1992,11 @@ body.dance-party .desktop-icon {
         min-height: 50px;
     }
 
-    .logo-letter.bounce { transform: translateY(-10px) scale(1.08) rotate(-3deg); }
+    .logo-letter.bounce,
+    .logo-letter.bounce-soft,
+    .logo-letter.bounce-wide {
+        transform: translateY(-10px) scale(1.08);
+    }
     .subtitle { font-size: 14px; }
     .window-grid { grid-template-columns: 1fr; }
     .page-grid { grid-template-columns: 1fr; }
@@ -2054,5 +2079,10 @@ body.dance-party .desktop-icon {
     .screensaver::before,
     .screensaver::after {
         opacity: 0.22;
+    }
+
+    .wallpaper,
+    .wallpaper::before {
+        animation: none !important;
     }
 }

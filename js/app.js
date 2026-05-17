@@ -197,6 +197,19 @@ document.addEventListener("keydown", function(event) {
     if (!startupScreen.classList.contains("hidden") && event.key === "Enter") enterSite();
 });
 
+document.addEventListener("keydown", function(event) {
+    if (!startupScreen.classList.contains("hidden") || isTypingTarget(event.target)) return;
+
+    const key = event.key.toLowerCase();
+    const index = Array.from(logoLetters).findIndex(function(letter) {
+        return letter.textContent.toLowerCase() === key;
+    });
+
+    if (index !== -1) {
+        playLogoKey(index);
+    }
+});
+
 document.getElementById("musicButton").addEventListener("click", toggleMusic);
 document.getElementById("musicButton2").addEventListener("click", toggleMusic);
 document.getElementById("warpButton").addEventListener("click", startRealityWarp);
@@ -1200,7 +1213,7 @@ function bounceLogoLetter(index, className) {
 
     setTimeout(function() {
         letter.classList.remove(className);
-    }, 145);
+    }, 220);
 }
 
 function playLogoKey(index) {
@@ -1213,6 +1226,13 @@ function playLogoKey(index) {
     if (!isPlaying) {
         addLine("LOGO KEY: " + logoLetters[index].textContent + " " + Math.round(note) + "HZ.");
     }
+}
+
+function isTypingTarget(target) {
+    if (!target) return false;
+
+    const tagName = target.tagName;
+    return tagName === "INPUT" || tagName === "TEXTAREA" || target.isContentEditable;
 }
 
 function pulseRecord() {
