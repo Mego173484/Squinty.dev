@@ -1041,6 +1041,134 @@ body.music-playing .volume-bars span:nth-child(6) { animation: barMove 0.22s eas
     text-align: center;
 }
 
+.hidden-view {
+    display: none;
+}
+
+.driver-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 9400;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background:
+        repeating-linear-gradient(to bottom, rgba(255,255,255,0.04), rgba(255,255,255,0.04) 1px, transparent 1px, transparent 5px),
+        radial-gradient(circle at center, rgba(77,255,223,0.16), transparent 38%),
+        rgba(0, 9, 7, 0.94);
+}
+
+.driver-loader.visible {
+    display: flex;
+}
+
+.driver-box {
+    width: min(620px, 90vw);
+    padding: 22px;
+    border: 4px ridge var(--cyan);
+    background: rgba(0,0,0,0.78);
+    box-shadow: 0 0 26px var(--cyan), inset 0 0 24px rgba(44,255,106,0.16);
+    text-align: center;
+}
+
+.driver-title {
+    color: var(--green);
+    font-size: clamp(26px, 7vw, 54px);
+    font-weight: bold;
+    text-shadow: 0 0 18px var(--green), 0 0 40px var(--cyan);
+}
+
+.driver-progress {
+    height: 18px;
+    margin: 18px auto 8px auto;
+    border: 3px inset var(--cyan);
+    background: rgba(0,0,0,0.85);
+    overflow: hidden;
+}
+
+.driver-progress span {
+    display: block;
+    height: 100%;
+    background: repeating-linear-gradient(45deg, var(--green), var(--green) 8px, var(--cyan) 8px, var(--cyan) 16px);
+    animation: driverLoad 1.05s ease-out forwards;
+}
+
+.driver-line {
+    color: #aaffc7;
+    font-family: var(--terminal-font);
+    font-size: 13px;
+}
+
+@keyframes driverLoad {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+.site-page {
+    display: none;
+    width: 980px;
+    max-width: 94%;
+    margin: 34px auto 48px auto;
+}
+
+.site-page.active {
+    display: block;
+}
+
+.page-shell {
+    padding: 18px;
+    border: 4px ridge var(--cyan);
+    background: linear-gradient(to bottom, rgba(8, 60, 50, 0.94), rgba(4, 23, 28, 0.96));
+    box-shadow: 0 0 22px var(--cyan), 0 0 48px rgba(44,255,106,0.62), inset 0 0 36px rgba(0,0,0,0.55);
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 3px solid var(--cyan);
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+}
+
+.page-header h2 {
+    margin: 0;
+    color: var(--green);
+    text-shadow: 0 0 16px var(--green);
+}
+
+.page-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.video-card,
+.gallery-card {
+    border: 3px ridge var(--cyan);
+    background: rgba(0,0,0,0.32);
+    padding: 12px;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.3), 0 0 18px rgba(77,255,223,0.3);
+}
+
+.gallery-tile {
+    min-height: 130px;
+    margin-bottom: 10px;
+    border: 3px inset var(--green);
+    background:
+        radial-gradient(circle at 35% 35%, rgba(247,255,107,0.18), transparent 18%),
+        linear-gradient(135deg, rgba(44,255,106,0.2), rgba(45,140,255,0.16)),
+        rgba(0,0,0,0.28);
+}
+
+.gallery-card h3,
+.video-card h3 {
+    margin-top: 0;
+    color: #caffd7;
+}
+
 .screensaver {
     position: fixed;
     inset: 0;
@@ -1317,6 +1445,15 @@ body.dance-party .desktop-icon {
     .logo-letter.bounce { transform: translateY(-10px) scale(1.08) rotate(-3deg); }
     .subtitle { font-size: 14px; }
     .window-grid { grid-template-columns: 1fr; }
+    .page-grid { grid-template-columns: 1fr; }
+
+    .page-header {
+        align-items: stretch;
+    }
+
+    .page-header .os-button {
+        width: 100%;
+    }
 
     .desktop-icon {
         width: 82px;
@@ -1409,6 +1546,14 @@ body.dance-party .desktop-icon {
     <div class="screensaver-text">screensaver active<br>move / tap / press any key to return</div>
 </div>
 
+<div class="driver-loader" id="driverLoader">
+    <div class="driver-box">
+        <div class="driver-title" id="driverTitle">LOADING DRIVER</div>
+        <div class="driver-progress"><span></span></div>
+        <div class="driver-line" id="driverLine">INITIALIZING PAGE DRIVER...</div>
+    </div>
+</div>
+
 <div class="wallpaper"></div>
 <div class="float-line one"></div>
 <div class="float-line two"></div>
@@ -1418,7 +1563,7 @@ body.dance-party .desktop-icon {
     <span>squinkyDOS 173484 :: REAL VISITS <b id="visitorCount">----</b> :: TODAY <b id="visitorToday">--</b> :: <b id="counterMode">SYNCING</b> :: VIDEOS :: MOD NOTES :: MUSIC PLAYER :: OLD COMPUTER MODE</span>
 </div>
 
-<div class="desktop-wrap">
+<div class="desktop-wrap" id="homePage">
     <canvas id="waveBorder"></canvas>
     <main class="desktop" id="desktop">
         <section class="top-area">
@@ -1449,6 +1594,8 @@ body.dance-party .desktop-icon {
             <div class="desktop-icon" data-window="terminalWindow"><div class="icon-art note"></div><div class="icon-label">terminal</div></div>
             <div class="desktop-icon" data-window="aboutWindow"><div class="icon-art folder"></div><div class="icon-label">about</div></div>
             <div class="desktop-icon" data-window="fileWindow"><div class="icon-art disk"></div><div class="icon-label">local disk</div></div>
+            <div class="desktop-icon" data-page="videosPage"><div class="icon-art video"></div><div class="icon-label">all videos</div></div>
+            <div class="desktop-icon" data-page="galleryPage"><div class="icon-art folder"></div><div class="icon-label">mod gallery</div></div>
         </section>
 
         <section class="window-grid">
@@ -1592,10 +1739,67 @@ body.dance-party .desktop-icon {
             <button class="task-button" data-window="terminalWindow">Terminal</button>
             <button class="task-button" data-window="aboutWindow">About</button>
             <button class="task-button" data-window="fileWindow">Local Disk</button>
+            <button class="task-button" data-page="videosPage">All Videos</button>
+            <button class="task-button" data-page="galleryPage">Mod Gallery</button>
         </nav>
         <div class="footer">squinky.dev :: squinkyDOS 173484</div>
     </main>
 </div>
+
+<section class="site-page" id="videosPage">
+    <div class="page-shell">
+        <div class="page-header">
+            <h2>ALL_VIDEOS.DRV</h2>
+            <button class="os-button" data-page="homePage">RETURN TO DESKTOP</button>
+        </div>
+        <div class="page-grid">
+            <article class="video-card">
+                <h3>Latest Upload</h3>
+                <p class="small-text">Embedded from the current squinkyDOS video slot.</p>
+                <div class="video-frame">
+                    <iframe id="youtubeFramePage" title="Latest video page embed" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+                <a class="link-button" href="https://www.youtube.com/@Mego17saint/videos" target="_blank" rel="noopener noreferrer">OPEN FULL VIDEO INDEX</a>
+            </article>
+            <article class="video-card">
+                <h3>Video Library Disk</h3>
+                <p class="small-text">Static site mode: add more video IDs here as uploads are selected for the archive.</p>
+                <div class="file-preview">A:/VIDEO<br>LATEST_VIDEO.URL<br>CHANNEL_VIDEOS.LNK<br>ARCHIVE_SLOTS: WAITING</div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="site-page" id="galleryPage">
+    <div class="page-shell">
+        <div class="page-header">
+            <h2>MOD_GALLERY.DRV</h2>
+            <button class="os-button" data-page="homePage">RETURN TO DESKTOP</button>
+        </div>
+        <div class="page-grid">
+            <article class="gallery-card">
+                <div class="gallery-tile"></div>
+                <h3>Iterator Room Mood</h3>
+                <p class="small-text">Gallery slot ready. Progress remains 0% until real images are added.</p>
+            </article>
+            <article class="gallery-card">
+                <div class="gallery-tile"></div>
+                <h3>Green Signal Effects</h3>
+                <p class="small-text">Concept slot for glow references, palettes, and visual tests.</p>
+            </article>
+            <article class="gallery-card">
+                <div class="gallery-tile"></div>
+                <h3>Saint-Related Work</h3>
+                <p class="small-text">Placeholder gallery tile. No real mod progress invented.</p>
+            </article>
+            <article class="gallery-card">
+                <div class="gallery-tile"></div>
+                <h3>Signals Folder</h3>
+                <p class="small-text">A place for screenshots, mockups, and notes when the real files arrive.</p>
+            </article>
+        </div>
+    </div>
+</section>
 
 <script>
 const LATEST_VIDEO_ID = "BBib-8NMGP8";
@@ -1680,6 +1884,11 @@ const themes = [
 const startupScreen = document.getElementById("startupScreen");
 const terminatedScreen = document.getElementById("terminatedScreen");
 const screensaver = document.getElementById("screensaver");
+const driverLoader = document.getElementById("driverLoader");
+const driverTitle = document.getElementById("driverTitle");
+const driverLine = document.getElementById("driverLine");
+const homePage = document.getElementById("homePage");
+const pageViews = document.querySelectorAll(".site-page");
 const enterSiteButton = document.getElementById("enterSiteButton");
 const rebootButton = document.getElementById("rebootButton");
 const bootLines = document.getElementById("bootLines");
@@ -1716,6 +1925,7 @@ const logoLetters = document.querySelectorAll(".logo-letter");
 const notes = [392, 523, 659, 523, 440, 587, 740, 587, 349, 440, 523, 440, 330, 392, 494, 392];
 
 document.getElementById("youtubeFrame").src = "https://www.youtube.com/embed/" + LATEST_VIDEO_ID;
+document.getElementById("youtubeFramePage").src = "https://www.youtube.com/embed/" + LATEST_VIDEO_ID;
 renderBootLines();
 rerollSplash(false);
 recordVisitorCount();
@@ -1738,6 +1948,10 @@ document.getElementById("terminateButton").addEventListener("click", terminateOS
 
 document.querySelectorAll("[data-window]").forEach(function(button) {
     button.addEventListener("click", function() { focusWindow(button.dataset.window); });
+});
+
+document.querySelectorAll("[data-page]").forEach(function(button) {
+    button.addEventListener("click", function() { loadPage(button.dataset.page); });
 });
 
 document.querySelectorAll("[data-window-action]").forEach(function(button) {
@@ -1976,10 +2190,16 @@ function runCommand(rawCommand) {
     addLine("SQUINK> " + rawCommand.toUpperCase());
 
     if (command === "help") {
-        addLine("COMMANDS: HELP, VIDEO, MOD, MUSIC, ABOUT, FILES, SQUINK, COLOR, WAVE, SPLASH, STATUS, DIR, OPEN README, OPEN SIGNALS, VERSION, SITE, SCAN, GLOW, DANCE, SAVER, RESET, REBOOT, TERMINATE, SHUTDOWN, CLEAR");
+        addLine("COMMANDS: HELP, VIDEO, VIDEOS, GALLERY, HOME, MOD, MUSIC, ABOUT, FILES, SQUINK, COLOR, WAVE, SPLASH, STATUS, DIR, OPEN README, OPEN SIGNALS, VERSION, SITE, SCAN, GLOW, DANCE, SAVER, RESET, REBOOT, TERMINATE, SHUTDOWN, CLEAR");
     } else if (command === "video") {
         focusWindow("videoWindow");
         addLine("OPENED LATEST_VIDEO.URL.");
+    } else if (command === "videos") {
+        loadPage("videosPage");
+    } else if (command === "gallery") {
+        loadPage("galleryPage");
+    } else if (command === "home") {
+        loadPage("homePage");
     } else if (command === "mod") {
         focusWindow("modWindow");
         addLine("OPENED FALLEN_GRACE_MOD_TRACKER.EXE.");
@@ -2152,6 +2372,44 @@ function updateDepthFromPointer(event) {
     document.documentElement.style.setProperty("--tilt-x", (y * -1.6).toFixed(2) + "deg");
 }
 
+// Page driver loading
+function loadPage(pageId) {
+    noteUserActivity();
+    hideScreensaver();
+    playDriverBootSound();
+
+    const labels = {
+        homePage: "DESKTOP DRIVER",
+        videosPage: "VIDEO DRIVER",
+        galleryPage: "GALLERY DRIVER"
+    };
+
+    driverTitle.textContent = "LOADING " + (labels[pageId] || "PAGE DRIVER");
+    driverLine.textContent = "MOUNTING " + pageId.toUpperCase() + "...";
+    driverLoader.classList.add("visible");
+
+    setTimeout(function() {
+        homePage.classList.toggle("hidden-view", pageId !== "homePage");
+
+        pageViews.forEach(function(page) {
+            page.classList.toggle("active", page.id === pageId);
+        });
+
+        driverLoader.classList.remove("visible");
+        resizeBorderCanvas();
+        addLine("PAGE DRIVER LOADED: " + (labels[pageId] || pageId).toUpperCase() + ".");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 1120);
+}
+
+function showHomeImmediately() {
+    homePage.classList.remove("hidden-view");
+    pageViews.forEach(function(page) {
+        page.classList.remove("active");
+    });
+    driverLoader.classList.remove("visible");
+}
+
 // Window focus and theme controls
 function handleWindowAction(windowElement, action) {
     if (!windowElement) return;
@@ -2214,6 +2472,7 @@ function resetOS() {
     stopMusic();
     hideScreensaver();
     clearTimeout(systemEventTimer);
+    showHomeImmediately();
     document.body.classList.remove("music-playing", "warping");
     terminatedScreen.classList.remove("visible");
     startupScreen.classList.remove("hidden");
@@ -2239,6 +2498,7 @@ function terminateOS() {
     hideScreensaver();
     clearTimeout(screensaverTimer);
     clearTimeout(systemEventTimer);
+    showHomeImmediately();
     document.body.classList.remove("music-playing", "warping");
     startupScreen.classList.add("hidden");
     terminatedScreen.classList.add("visible");
@@ -2378,6 +2638,33 @@ function playTerminateSound() {
     gain.connect(masterGain);
     osc.start(now);
     osc.stop(now + 1.3);
+}
+
+function playDriverBootSound() {
+    ensureAudio();
+
+    const now = audioCtx.currentTime;
+    const tones = [
+        { f: 130.81, t: 0.00, d: 0.18 },
+        { f: 196.00, t: 0.16, d: 0.16 },
+        { f: 261.63, t: 0.31, d: 0.18 },
+        { f: 392.00, t: 0.50, d: 0.24 }
+    ];
+
+    tones.forEach(function(tone) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "square";
+        osc.frequency.value = tone.f;
+        gain.gain.setValueAtTime(0.0001, now + tone.t);
+        gain.gain.exponentialRampToValueAtTime(0.09, now + tone.t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + tone.t + tone.d);
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.start(now + tone.t);
+        osc.stop(now + tone.t + tone.d + 0.02);
+    });
 }
 
 function bounceLetter() {
