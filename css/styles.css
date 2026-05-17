@@ -378,6 +378,48 @@ body:not(.warping) .desktop {
     pointer-events: none;
 }
 
+body.theme-win-dos .desktop {
+    background: linear-gradient(to bottom, rgba(0, 0, 170, 0.96), rgba(0, 42, 108, 0.96)), radial-gradient(circle at 18% 18%, rgba(0,255,255,0.15), transparent 24%);
+}
+
+body.theme-classic-mac {
+    color: #111111;
+}
+
+body.theme-classic-mac .desktop,
+body.theme-classic-mac .page-shell {
+    background: linear-gradient(to bottom, rgba(238,238,238,0.96), rgba(178,178,178,0.96));
+    color: #111111;
+}
+
+body.theme-classic-mac .window,
+body.theme-classic-mac .video-card,
+body.theme-classic-mac .gallery-card,
+body.theme-classic-mac .guestbook-panel {
+    background: rgba(245,245,245,0.94);
+    color: #111111;
+}
+
+body.theme-classic-mac .small-text,
+body.theme-classic-mac .footer {
+    color: #333333;
+}
+
+body.theme-concord .desktop {
+    background: linear-gradient(135deg, rgba(6, 10, 35, 0.96), rgba(76, 8, 24, 0.94)), radial-gradient(circle at 78% 18%, rgba(255,255,255,0.18), transparent 22%);
+}
+
+body.theme-emoji-web .desktop {
+    background:
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.07) 0 8px, transparent 8px 18px),
+        linear-gradient(135deg, rgba(93, 0, 180, 0.95), rgba(0, 91, 180, 0.95), rgba(210, 0, 120, 0.9));
+}
+
+.theme-extra {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
 .top-area {
     position: relative;
     z-index: 2;
@@ -634,6 +676,34 @@ body:not(.warping) .window:hover {
     font-weight: bold;
     font-size: 13px;
     user-select: none;
+}
+
+body.theme-win-dos .titlebar {
+    background: linear-gradient(to right, #000080, #1084d0);
+    color: #ffffff;
+}
+
+body.theme-classic-mac .titlebar {
+    background: repeating-linear-gradient(to bottom, #f9f9f9 0 2px, #b8b8b8 2px 4px);
+    color: #111111;
+    border-bottom-color: #111111;
+}
+
+body.theme-concord .titlebar {
+    background: linear-gradient(to right, #142b8f, #f7fbff 50%, #b80f2f);
+    color: #050713;
+}
+
+body.theme-emoji-web .titlebar {
+    background: linear-gradient(to right, #ff4df3, #fff200, #39ff14, #2fffff);
+    color: #170021;
+}
+
+body.theme-emoji-web .os-button,
+body.theme-emoji-web .task-button,
+body.theme-emoji-web .link-button {
+    background: linear-gradient(to bottom, #ffffff, #fff200 28%, #39ff14 56%, #ff4df3);
+    color: #160020;
 }
 
 .window-buttons { display: flex; gap: 4px; }
@@ -1157,6 +1227,42 @@ body.music-playing .volume-bars span:nth-child(6) { animation: barMove 0.22s eas
         radial-gradient(circle at 35% 35%, rgba(247,255,107,0.18), transparent 18%),
         linear-gradient(135deg, rgba(44,255,106,0.2), rgba(45,140,255,0.16)),
         rgba(0,0,0,0.28);
+}
+
+.media-tile {
+    overflow: hidden;
+    background: #000;
+}
+
+.media-tile img {
+    display: block;
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    image-rendering: pixelated;
+}
+
+.gif-slot {
+    margin-top: 10px;
+    border: 3px inset var(--cyan);
+    background: rgba(0,0,0,0.42);
+    overflow: hidden;
+}
+
+.gif-slot.compact iframe {
+    display: block;
+    width: 100%;
+    height: 170px;
+    border: 0;
+}
+
+.gif-caption {
+    padding: 6px 8px;
+    border-top: 2px dotted var(--green);
+    color: var(--accent-yellow);
+    font: bold 11px var(--terminal-font);
+    text-align: center;
+    background: rgba(0,0,0,0.35);
 }
 
 .gallery-card h3,

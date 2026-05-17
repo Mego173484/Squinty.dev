@@ -7,6 +7,13 @@ const GUESTBOOK_LOCAL_LIMIT = 20;
 const SCREENSAVER_DELAY = 60000;
 const SYSTEM_EVENT_DELAY = 18000;
 const API_BASE = window.SQUINKY_API_BASE || "/api";
+const SFX_PATHS = {
+    dialup: "assets/sfx/dialup-short.oga",
+    blip: "assets/sfx/blip.ogg",
+    happy: "assets/sfx/happy-beep.ogg",
+    error: "assets/sfx/buzzer.ogg",
+    keyboard: "assets/sfx/keyboard-noise.ogg"
+};
 
 // Boot and flavor text pools
 const bootLinePool = [
@@ -90,14 +97,23 @@ let screensaverActive = false;
 let isTerminated = false;
 let currentSplash = "";
 let bootTimestamp = Date.now();
+const sfxPlayers = {};
 
 // Theme data
 const themes = [
     { name: "GREEN-BLUE", green: "#2cff6a", blue: "#2d8cff", cyan: "#4dffdf", yellow: "#f7ff6b", wallA: "#164d3d", wallB: "#06211f", wallC: "#010807" },
     { name: "SAINT GLOW", green: "#9cff57", blue: "#25b6ff", cyan: "#bcfff7", yellow: "#fff4a8", wallA: "#2f6b3a", wallB: "#103b2d", wallC: "#03120d" },
     { name: "COLD TERMINAL", green: "#39ffb6", blue: "#245dff", cyan: "#00d5ff", yellow: "#dbff63", wallA: "#143d4d", wallB: "#071d32", wallC: "#020611" },
-    { name: "ODD FILE", green: "#b6ff4d", blue: "#008cff", cyan: "#66ffcc", yellow: "#ffffff", wallA: "#4c5b1d", wallB: "#102d2e", wallC: "#060806" }
+    { name: "ODD FILE", green: "#b6ff4d", blue: "#008cff", cyan: "#66ffcc", yellow: "#ffffff", wallA: "#4c5b1d", wallB: "#102d2e", wallC: "#060806" },
+    { name: "WINDOWS DOS", className: "theme-win-dos", green: "#00ff66", blue: "#0000aa", cyan: "#00ffff", yellow: "#ffff55", wallA: "#1d4f8f", wallB: "#001f55", wallC: "#000020" },
+    { name: "CLASSIC MAC", className: "theme-classic-mac", green: "#222222", blue: "#666666", cyan: "#f2f2f2", yellow: "#111111", wallA: "#d8d8d8", wallB: "#8f8f8f", wallC: "#242424" },
+    { name: "CONCORD", className: "theme-concord", green: "#ff3d3d", blue: "#244dff", cyan: "#f7fbff", yellow: "#ffd24a", wallA: "#5d1020", wallB: "#101a4e", wallC: "#050713" },
+    { name: "EMOJI WEB 1.0", className: "theme-emoji-web", extraText: " ✨ 🌈 💾 🎵 ⭐", green: "#39ff14", blue: "#ff4df3", cyan: "#2fffff", yellow: "#fff200", wallA: "#ff7ac8", wallB: "#4c2dff", wallC: "#08002b" }
 ];
+
+const themeClasses = themes
+    .map(function(theme) { return theme.className; })
+    .filter(Boolean);
 
 // DOM references
 const startupScreen = document.getElementById("startupScreen");
@@ -113,6 +129,7 @@ const rebootButton = document.getElementById("rebootButton");
 const bootLines = document.getElementById("bootLines");
 const logoText = "SQUINKY.DEV";
 const logo = document.getElementById("logo");
+const subtitle = document.querySelector(".subtitle");
 const desktop = document.getElementById("desktop");
 const borderCanvas = document.getElementById("waveBorder");
 const borderCtx = borderCanvas.getContext("2d");
@@ -146,6 +163,9 @@ logoText.split("").forEach(function(letter) {
 });
 
 const logoLetters = document.querySelectorAll(".logo-letter");
+const themeExtra = document.createElement("span");
+themeExtra.className = "theme-extra";
+subtitle.appendChild(themeExtra);
 const notes = [392, 523, 659, 523, 440, 587, 740, 587, 349, 440, 523, 440, 330, 392, 494, 392];
 
 document.getElementById("youtubeFrame").src = "https://www.youtube.com/embed/" + LATEST_VIDEO_ID;
@@ -239,6 +259,7 @@ function enterSite() {
     if (isTerminated) return;
     noteUserActivity();
     if (ensureAudio()) playStartupFanfare();
+    playAssetSound("happy", 0.28);
     startupScreen.classList.add("hidden");
     startupScreen.classList.remove("visible");
     startWaveBorder();
@@ -253,6 +274,34 @@ function addLine(text) {
     line.textContent = text;
     terminalOutput.appendChild(line);
     terminalOutput.scrollTop = terminalOutput.scrollHeight;
+}
+
+function playAssetSound(name, volume) {
+    if (!SFX_PATHS[name]) return;
+
+    try {
+        if (!sfxPlayers[name]) {
+            sfxPlayers[name] = new Audio(SFX_PATHS[name]);
+            sfxPlayers[name].preload = "auto";
+        }
+
+        const player = sfxPlayers[name];
+        player.pause();
+        player.currentTime = 0;
+        player.volume = volume;
+        player.play().catch(function() {});
+    } catch (error) {}
+}
+
+function playTimedAssetSound(name, volume, duration) {
+    playAssetSound(name, volume);
+
+    setTimeout(function() {
+        const player = sfxPlayers[name];
+        if (!player) return;
+        player.pause();
+        player.currentTime = 0;
+    }, duration);
 }
 
 // Screensaver and activity tracking
@@ -487,11 +536,13 @@ function submitGuestbookEntry(event) {
     const message = guestbookMessage.value.trim();
 
     if (message.length < 2) {
+        playAssetSound("error", 0.22);
         setGuestbookStatus("MESSAGE TOO SHORT.");
         return;
     }
 
     if (hasBlockedWords(name) || hasBlockedWords(message)) {
+        playAssetSound("error", 0.22);
         setGuestbookStatus("SIGNAL REJECTED: CURSING FILTER TRIPPED.");
         return;
     }
@@ -513,6 +564,7 @@ function submitGuestbookEntry(event) {
     })
     .then(function() {
         guestbookMessage.value = "";
+        playAssetSound("happy", 0.24);
         setGuestbookStatus("SIGNAL SAVED.");
         loadGuestbook();
         addLine("GUESTBOOK SIGNAL SAVED.");
@@ -520,12 +572,14 @@ function submitGuestbookEntry(event) {
     .catch(function(error) {
         if (saveLocalGuestbookEntry(name, message)) {
             guestbookMessage.value = "";
+            playAssetSound("happy", 0.24);
             renderGuestbookEntries(readLocalGuestbookEntries());
             setGuestbookStatus("API OFFLINE. SIGNAL SAVED TO LOCAL CACHE.");
             addLine("GUESTBOOK API OFFLINE. SIGNAL SAVED LOCALLY.");
             return;
         }
 
+        playAssetSound("error", 0.22);
         setGuestbookStatus("SIGNAL FAILED: " + getGuestbookErrorMessage(error).toUpperCase() + ".");
     });
 }
@@ -599,6 +653,7 @@ function shuffleArray(items) {
 // Terminal commands
 function runCommand(rawCommand) {
     const command = rawCommand.toLowerCase().replace(/\s+/g, " ").trim();
+    playTimedAssetSound("keyboard", 0.1, 520);
     addLine("SQUINK> " + rawCommand.toUpperCase());
 
     if (command === "help") {
@@ -670,6 +725,7 @@ function runCommand(rawCommand) {
         terminalOutput.innerHTML = "";
         addLine("TERMINAL CLEARED.");
     } else {
+        playAssetSound("error", 0.2);
         addLine("UNKNOWN COMMAND. TRY HELP.");
     }
 }
@@ -808,6 +864,7 @@ function loadPage(pageId) {
     noteUserActivity();
     hideScreensaver();
     playDriverBootSound();
+    playTimedAssetSound("dialup", 0.2, 1800);
 
     const labels = {
         homePage: "DESKTOP DRIVER",
@@ -849,6 +906,7 @@ function showHomeImmediately() {
 // Window focus and theme controls
 function handleWindowAction(windowElement, action) {
     if (!windowElement) return;
+    playAssetSound(action === "close" ? "error" : "blip", 0.16);
 
     if (action === "focus") {
         focusWindow(windowElement.id);
@@ -878,6 +936,8 @@ function focusWindow(id) {
 function cycleTheme() {
     themeIndex = (themeIndex + 1) % themes.length;
     const theme = themes[themeIndex];
+    document.body.classList.remove.apply(document.body.classList, themeClasses);
+    if (theme.className) document.body.classList.add(theme.className);
     document.documentElement.style.setProperty("--green", theme.green);
     document.documentElement.style.setProperty("--blue", theme.blue);
     document.documentElement.style.setProperty("--cyan", theme.cyan);
@@ -885,6 +945,7 @@ function cycleTheme() {
     document.documentElement.style.setProperty("--wall-a", theme.wallA);
     document.documentElement.style.setProperty("--wall-b", theme.wallB);
     document.documentElement.style.setProperty("--wall-c", theme.wallC);
+    themeExtra.textContent = theme.extraText || "";
     paletteReadout.textContent = "PALETTE: " + theme.name + " [" + (themeIndex + 1) + "/" + themes.length + "]";
     showThemeFlash("COLOR SHIFT: " + theme.name);
     addLine("COLOR SHIFT: " + theme.name + ".");
