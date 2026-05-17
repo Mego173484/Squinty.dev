@@ -2,6 +2,8 @@ const LATEST_VIDEO_ID = "BBib-8NMGP8";
 const DOS_VERSION = "173484";
 const VISITOR_BASE = 173484;
 const VISITOR_STORAGE_KEY = "squinky.dev.localVisits";
+const GUESTBOOK_STORAGE_KEY = "squinky.dev.localGuestbook";
+const GUESTBOOK_LOCAL_LIMIT = 20;
 const SCREENSAVER_DELAY = 60000;
 const SYSTEM_EVENT_DELAY = 18000;
 const API_BASE = window.SQUINKY_API_BASE || "/api";
@@ -440,8 +442,11 @@ function loadGuestbook() {
             setGuestbookStatus("GUESTBOOK DRIVER ONLINE.");
         })
         .catch(function() {
-            guestbookList.innerHTML = '<div class="guestbook-empty">GUESTBOOK API OFFLINE. DEPLOY THE WORKER TO ACCEPT SIGNALS.</div>';
-            setGuestbookStatus("GUESTBOOK DRIVER OFFLINE.");
+            const fallbackEntries = readLocalGuestbookEntries();
+            renderGuestbookEntries(fallbackEntries);
+            setGuestbookStatus(fallbackEntries.length
+                ? "GUESTBOOK API OFFLINE. SHOWING LOCAL SIGNALS."
+                : "GUESTBOOK API OFFLINE. LOCAL SIGNAL CACHE READY.");
         });
 }
 
@@ -513,8 +518,41 @@ function submitGuestbookEntry(event) {
         addLine("GUESTBOOK SIGNAL SAVED.");
     })
     .catch(function(error) {
+        if (saveLocalGuestbookEntry(name, message)) {
+            guestbookMessage.value = "";
+            renderGuestbookEntries(readLocalGuestbookEntries());
+            setGuestbookStatus("API OFFLINE. SIGNAL SAVED TO LOCAL CACHE.");
+            addLine("GUESTBOOK API OFFLINE. SIGNAL SAVED LOCALLY.");
+            return;
+        }
+
         setGuestbookStatus("SIGNAL FAILED: " + getGuestbookErrorMessage(error).toUpperCase() + ".");
     });
+}
+
+function readLocalGuestbookEntries() {
+    try {
+        const entries = JSON.parse(localStorage.getItem(GUESTBOOK_STORAGE_KEY) || "[]");
+        return Array.isArray(entries) ? entries.slice(0, GUESTBOOK_LOCAL_LIMIT) : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function saveLocalGuestbookEntry(name, message) {
+    try {
+        const entries = readLocalGuestbookEntries();
+        entries.unshift({
+            id: "local-" + Date.now(),
+            name: name,
+            message: message,
+            createdAt: new Date().toISOString()
+        });
+        localStorage.setItem(GUESTBOOK_STORAGE_KEY, JSON.stringify(entries.slice(0, GUESTBOOK_LOCAL_LIMIT)));
+        return true;
+    } catch (error) {
+        return false;
+    }
 }
 
 function readGuestbookResponse(response) {
