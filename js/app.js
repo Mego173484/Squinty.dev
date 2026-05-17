@@ -8,11 +8,11 @@ const SCREENSAVER_DELAY = 60000;
 const SYSTEM_EVENT_DELAY = 18000;
 const API_BASE = window.SQUINKY_API_BASE || "/api";
 const SFX_PATHS = {
-    dialup: "assets/sfx/dialup-short.oga",
-    blip: "assets/sfx/blip.ogg",
-    happy: "assets/sfx/happy-beep.ogg",
-    error: "assets/sfx/buzzer.ogg",
-    keyboard: "assets/sfx/keyboard-noise.ogg"
+    dialup: "assets/sfx/dialup-short.mp3",
+    blip: "assets/sfx/blip.mp3",
+    happy: "assets/sfx/happy-beep.mp3",
+    error: "assets/sfx/buzzer.mp3",
+    keyboard: "assets/sfx/keyboard-noise.mp3"
 };
 
 // Boot and flavor text pools
@@ -105,8 +105,9 @@ const themes = [
     { name: "SAINT GLOW", green: "#9cff57", blue: "#25b6ff", cyan: "#bcfff7", yellow: "#fff4a8", wallA: "#2f6b3a", wallB: "#103b2d", wallC: "#03120d" },
     { name: "COLD TERMINAL", green: "#39ffb6", blue: "#245dff", cyan: "#00d5ff", yellow: "#dbff63", wallA: "#143d4d", wallB: "#071d32", wallC: "#020611" },
     { name: "ODD FILE", green: "#b6ff4d", blue: "#008cff", cyan: "#66ffcc", yellow: "#ffffff", wallA: "#4c5b1d", wallB: "#102d2e", wallC: "#060806" },
-    { name: "WINDOWS DOS", className: "theme-win-dos", green: "#00ff66", blue: "#0000aa", cyan: "#00ffff", yellow: "#ffff55", wallA: "#1d4f8f", wallB: "#001f55", wallC: "#000020" },
-    { name: "CLASSIC MAC", className: "theme-classic-mac", green: "#222222", blue: "#666666", cyan: "#f2f2f2", yellow: "#111111", wallA: "#d8d8d8", wallB: "#8f8f8f", wallC: "#242424" },
+    { name: "COMMODORE 64", className: "theme-c64", green: "#7fffff", blue: "#4035c8", cyan: "#8fe8ff", yellow: "#fff35a", wallA: "#4035c8", wallB: "#1a1680", wallC: "#070042" },
+    { name: "MS-DOS", className: "theme-msdos", green: "#c0c0c0", blue: "#0000aa", cyan: "#ffffff", yellow: "#ffff00", wallA: "#000000", wallB: "#000000", wallC: "#000000" },
+    { name: "SYSTEM 1", className: "theme-system-one", green: "#111111", blue: "#777777", cyan: "#ffffff", yellow: "#000000", wallA: "#f5f5f5", wallB: "#bdbdbd", wallC: "#777777" },
     { name: "CONCORD", className: "theme-concord", green: "#ff3d3d", blue: "#244dff", cyan: "#f7fbff", yellow: "#ffd24a", wallA: "#5d1020", wallB: "#101a4e", wallC: "#050713" },
     { name: "EMOJI WEB 1.0", className: "theme-emoji-web", extraText: " ✨ 🌈 💾 🎵 ⭐", green: "#39ff14", blue: "#ff4df3", cyan: "#2fffff", yellow: "#fff200", wallA: "#ff7ac8", wallB: "#4c2dff", wallC: "#08002b" }
 ];
@@ -141,6 +142,7 @@ const record = document.getElementById("record");
 const paletteReadout = document.getElementById("paletteReadout");
 const splashReadout = document.getElementById("splashReadout");
 const themeFlash = document.getElementById("themeFlash");
+const themeTray = document.getElementById("themeTray");
 const clockReadout = document.getElementById("clockReadout");
 const uptimeReadout = document.getElementById("uptimeReadout");
 const signalReadout = document.getElementById("signalReadout");
@@ -168,8 +170,18 @@ themeExtra.className = "theme-extra";
 subtitle.appendChild(themeExtra);
 const notes = [392, 523, 659, 523, 440, 587, 740, 587, 349, 440, 523, 440, 330, 392, 494, 392];
 
+themes.forEach(function(theme, index) {
+    const button = document.createElement("button");
+    button.className = "theme-chip";
+    button.type = "button";
+    button.textContent = theme.name;
+    button.dataset.themeIndex = String(index);
+    themeTray.appendChild(button);
+});
+
 document.getElementById("youtubeFrame").src = "https://www.youtube.com/embed/" + LATEST_VIDEO_ID;
 document.getElementById("youtubeFramePage").src = "https://www.youtube.com/embed/" + LATEST_VIDEO_ID;
+setTheme(themeIndex, false);
 renderBootLines();
 rerollSplash(false);
 recordVisitorCount();
@@ -208,6 +220,10 @@ document.querySelectorAll("[data-window-action]").forEach(function(button) {
 
 document.querySelectorAll("[data-command]").forEach(function(button) {
     button.addEventListener("click", function() { runCommand(button.dataset.command); });
+});
+
+document.querySelectorAll("[data-theme-index]").forEach(function(button) {
+    button.addEventListener("click", function() { setTheme(Number(button.dataset.themeIndex), true); });
 });
 
 document.querySelectorAll("[data-file]").forEach(function(button) {
@@ -260,6 +276,7 @@ function enterSite() {
     noteUserActivity();
     if (ensureAudio()) playStartupFanfare();
     playAssetSound("happy", 0.28);
+    playTimedAssetSound("dialup", 0.16, 1400);
     startupScreen.classList.add("hidden");
     startupScreen.classList.remove("visible");
     startWaveBorder();
@@ -934,7 +951,11 @@ function focusWindow(id) {
 }
 
 function cycleTheme() {
-    themeIndex = (themeIndex + 1) % themes.length;
+    setTheme((themeIndex + 1) % themes.length, true);
+}
+
+function setTheme(index, announce) {
+    themeIndex = index;
     const theme = themes[themeIndex];
     document.body.classList.remove.apply(document.body.classList, themeClasses);
     if (theme.className) document.body.classList.add(theme.className);
@@ -946,9 +967,15 @@ function cycleTheme() {
     document.documentElement.style.setProperty("--wall-b", theme.wallB);
     document.documentElement.style.setProperty("--wall-c", theme.wallC);
     themeExtra.textContent = theme.extraText || "";
+    document.querySelectorAll("[data-theme-index]").forEach(function(button) {
+        button.classList.toggle("active", Number(button.dataset.themeIndex) === themeIndex);
+    });
     paletteReadout.textContent = "PALETTE: " + theme.name + " [" + (themeIndex + 1) + "/" + themes.length + "]";
-    showThemeFlash("COLOR SHIFT: " + theme.name);
-    addLine("COLOR SHIFT: " + theme.name + ".");
+    if (announce) {
+        playAssetSound("blip", 0.18);
+        showThemeFlash("COLOR SHIFT: " + theme.name);
+        addLine("COLOR SHIFT: " + theme.name + ".");
+    }
     document.body.style.filter = "saturate(1.45) brightness(1.08)";
     setTimeout(function() { document.body.style.filter = ""; }, 250);
 }

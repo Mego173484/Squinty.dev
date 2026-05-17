@@ -378,31 +378,171 @@ body:not(.warping) .desktop {
     pointer-events: none;
 }
 
-body.theme-win-dos .desktop {
-    background: linear-gradient(to bottom, rgba(0, 0, 170, 0.96), rgba(0, 42, 108, 0.96)), radial-gradient(circle at 18% 18%, rgba(0,255,255,0.15), transparent 24%);
+body.theme-c64 {
+    font-family: "Courier New", monospace;
+    color: #c5c0ff;
 }
 
-body.theme-classic-mac {
+body.theme-c64 .marquee {
+    background: #a85f00;
+    color: #1a0e00;
+    border-color: #fff35a;
+    text-shadow: none;
+}
+
+body.theme-c64 .desktop,
+body.theme-c64 .page-shell {
+    background:
+        linear-gradient(to bottom, rgba(64, 53, 200, 0.98), rgba(15, 10, 110, 0.98)),
+        repeating-linear-gradient(to bottom, transparent 0 7px, rgba(255,255,255,0.04) 7px 8px);
+    border: 3px solid #fff35a;
+    box-shadow: 0 0 0 3px #1a1680, 0 0 30px rgba(127,255,255,0.35);
+    color: #c5c0ff;
+}
+
+body.theme-c64 .top-area {
+    border: 0;
+    border-bottom: 4px solid #fff35a;
+    background: rgba(8, 4, 64, 0.35);
+}
+
+body.theme-c64 h1,
+body.theme-c64 .page-header h2 {
+    color: #c5c0ff;
+    text-shadow: 4px 4px 0 #101060;
+    letter-spacing: 4px;
+}
+
+body.theme-c64 .window,
+body.theme-c64 .video-card,
+body.theme-c64 .gallery-card,
+body.theme-c64 .guestbook-panel {
+    background: #000040;
+    border: 3px solid #c5c0ff;
+    box-shadow: 6px 6px 0 #151078;
+}
+
+body.theme-msdos {
+    font-family: "Courier New", monospace;
+    color: #c0c0c0;
+}
+
+body.theme-msdos .marquee,
+body.theme-msdos .desktop,
+body.theme-msdos .page-shell,
+body.theme-msdos .window,
+body.theme-msdos .video-card,
+body.theme-msdos .gallery-card,
+body.theme-msdos .guestbook-panel {
+    background: #000000;
+    color: #c0c0c0;
+    box-shadow: none;
+}
+
+body.theme-msdos .desktop,
+body.theme-msdos .page-shell {
+    border: 2px solid #c0c0c0;
+}
+
+body.theme-msdos .top-area {
+    border: 1px solid #c0c0c0;
+    background: #000000;
+}
+
+body.theme-msdos h1,
+body.theme-msdos .page-header h2 {
+    color: #ffffff;
+    text-shadow: none;
+    font-size: 42px;
+    letter-spacing: 0;
+}
+
+body.theme-msdos .window,
+body.theme-msdos .video-card,
+body.theme-msdos .gallery-card,
+body.theme-msdos .guestbook-panel {
+    border: 2px solid #c0c0c0;
+}
+
+body.theme-system-one {
+    color: #111111;
+    background: #bdbdbd;
+    font-family: Chicago, Geneva, "Helvetica Neue", Arial, sans-serif;
+}
+
+body.theme-system-one::before,
+body.theme-system-one::after {
+    opacity: 0;
+}
+
+body.theme-system-one .marquee {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+    text-shadow: none;
+}
+
+body.theme-system-one .desktop,
+body.theme-system-one .page-shell {
+    background:
+        repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0 1px, transparent 1px 4px),
+        #d8d8d8;
+    border: 2px solid #000000;
+    box-shadow: none;
+    color: #111111;
+    animation: none;
+}
+
+body.theme-system-one .top-area {
+    border: 1px solid #000000;
+    background: #ffffff;
+}
+
+body.theme-system-one h1,
+body.theme-system-one .page-header h2 {
+    color: #000000;
+    text-shadow: none;
+    font-size: 38px;
+    letter-spacing: 0;
+}
+
+body.theme-system-one .window,
+body.theme-system-one .video-card,
+body.theme-system-one .gallery-card,
+body.theme-system-one .guestbook-panel {
+    background: #ffffff;
+    border: 2px solid #000000;
+    box-shadow: none;
     color: #111111;
 }
 
-body.theme-classic-mac .desktop,
-body.theme-classic-mac .page-shell {
-    background: linear-gradient(to bottom, rgba(238,238,238,0.96), rgba(178,178,178,0.96));
-    color: #111111;
-}
-
-body.theme-classic-mac .window,
-body.theme-classic-mac .video-card,
-body.theme-classic-mac .gallery-card,
-body.theme-classic-mac .guestbook-panel {
-    background: rgba(245,245,245,0.94);
-    color: #111111;
-}
-
-body.theme-classic-mac .small-text,
-body.theme-classic-mac .footer {
+body.theme-system-one .small-text,
+body.theme-system-one .footer {
     color: #333333;
+}
+
+body.theme-c64 .wallpaper {
+    background:
+        repeating-linear-gradient(to bottom, rgba(255,255,255,0.04) 0 2px, transparent 2px 10px),
+        linear-gradient(to bottom, #4035c8, #151078);
+}
+
+body.theme-msdos .wallpaper {
+    background: #000000;
+}
+
+body.theme-system-one .wallpaper {
+    background:
+        repeating-linear-gradient(45deg, #cfcfcf 0 2px, #bdbdbd 2px 4px);
+}
+
+body.theme-msdos .wallpaper::before,
+body.theme-msdos .wallpaper::after,
+body.theme-system-one .wallpaper::before,
+body.theme-system-one .wallpaper::after,
+body.theme-msdos .float-line,
+body.theme-system-one .float-line {
+    display: none;
 }
 
 body.theme-concord .desktop {
@@ -522,6 +662,31 @@ h1 {
     justify-content: center;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.theme-tray {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.theme-chip {
+    min-height: 30px;
+    padding: 5px 8px;
+    border: 2px outset #dffff5;
+    background: rgba(0,0,0,0.38);
+    color: #dffff5;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.theme-chip:hover,
+.theme-chip.active {
+    background: linear-gradient(to bottom, #ffffff, var(--accent-yellow), var(--green));
+    color: #001b12;
 }
 
 button,
@@ -678,15 +843,156 @@ body:not(.warping) .window:hover {
     user-select: none;
 }
 
-body.theme-win-dos .titlebar {
-    background: linear-gradient(to right, #000080, #1084d0);
+body.theme-c64 .titlebar {
+    background: #c5c0ff;
+    color: #000040;
+    border-bottom: 3px solid #fff35a;
+}
+
+body.theme-msdos .titlebar {
+    background: #0000aa;
+    color: #ffffff;
+    border-bottom: 0;
+}
+
+body.theme-system-one .titlebar {
+    justify-content: center;
+    background: repeating-linear-gradient(to bottom, #ffffff 0 2px, #000000 2px 3px, #ffffff 3px 5px);
+    color: #111111;
+    border-bottom: 2px solid #000000;
+    text-align: center;
+    text-shadow:
+        -2px 0 #ffffff,
+        2px 0 #ffffff,
+        0 -2px #ffffff,
+        0 2px #ffffff;
+}
+
+body.theme-c64 .os-button,
+body.theme-c64 .task-button,
+body.theme-c64 .link-button,
+body.theme-c64 .theme-chip {
+    background: #7fffff;
+    color: #000040;
+    border: 3px solid #fff35a;
+    box-shadow: 3px 3px 0 #151078;
+    text-transform: uppercase;
+}
+
+body.theme-c64 .theme-chip.active {
+    background: #fff35a;
+    color: #000040;
+}
+
+body.theme-msdos .os-button,
+body.theme-msdos .task-button,
+body.theme-msdos .link-button,
+body.theme-msdos .theme-chip {
+    background: #c0c0c0;
+    color: #000000;
+    border: 2px outset #ffffff;
+    box-shadow: none;
+    text-transform: uppercase;
+}
+
+body.theme-msdos .theme-chip.active,
+body.theme-msdos .task-button:hover,
+body.theme-msdos .os-button:hover {
+    background: #0000aa;
     color: #ffffff;
 }
 
-body.theme-classic-mac .titlebar {
-    background: repeating-linear-gradient(to bottom, #f9f9f9 0 2px, #b8b8b8 2px 4px);
-    color: #111111;
-    border-bottom-color: #111111;
+body.theme-system-one .os-button,
+body.theme-system-one .task-button,
+body.theme-system-one .link-button,
+body.theme-system-one .theme-chip {
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #000000;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+body.theme-system-one .theme-chip.active,
+body.theme-system-one .os-button:hover,
+body.theme-system-one .task-button:hover {
+    background: #000000;
+    color: #ffffff;
+    filter: none;
+}
+
+body.theme-c64 .palette-readout,
+body.theme-c64 .os-readout,
+body.theme-c64 .splash-readout,
+body.theme-c64 .data-readout {
+    border: 2px solid #7fffff;
+    background: #151078;
+    color: #fff35a;
+    text-shadow: none;
+}
+
+body.theme-msdos .palette-readout,
+body.theme-msdos .os-readout,
+body.theme-msdos .splash-readout,
+body.theme-msdos .data-readout,
+body.theme-msdos .terminal-screen,
+body.theme-msdos .file-preview {
+    border: 1px solid #c0c0c0;
+    background: #000000;
+    color: #c0c0c0;
+    text-shadow: none;
+}
+
+body.theme-system-one .palette-readout,
+body.theme-system-one .os-readout,
+body.theme-system-one .splash-readout,
+body.theme-system-one .data-readout,
+body.theme-system-one .terminal-screen,
+body.theme-system-one .file-preview {
+    border: 1px solid #000000;
+    background: #ffffff;
+    color: #000000;
+    text-shadow: none;
+}
+
+body.theme-c64 .icon-art {
+    border: 3px solid #c5c0ff;
+    background: #7fffff;
+    box-shadow: 3px 3px 0 #151078;
+    border-radius: 0;
+}
+
+body.theme-msdos .icon-art {
+    border: 2px solid #c0c0c0;
+    background: #0000aa;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+body.theme-system-one .icon-art {
+    border: 2px solid #000000;
+    background: #ffffff;
+    box-shadow: none;
+    border-radius: 0;
+    clip-path: none;
+}
+
+body.theme-system-one .icon-art.folder {
+    background:
+        linear-gradient(to bottom, #ffffff 0 20%, #000000 20% 28%, #ffffff 28% 100%);
+}
+
+body.theme-system-one .desktop-icon:hover,
+body.theme-system-one .window:hover,
+body.theme-msdos .desktop-icon:hover,
+body.theme-msdos .window:hover {
+    transform: none;
+    filter: none;
+}
+
+body.theme-system-one:not(.warping) .desktop,
+body.theme-msdos:not(.warping) .desktop {
+    transform: none;
 }
 
 body.theme-concord .titlebar {
@@ -1243,10 +1549,15 @@ body.music-playing .volume-bars span:nth-child(6) { animation: barMove 0.22s eas
 }
 
 .gif-slot {
+    display: none;
     margin-top: 10px;
     border: 3px inset var(--cyan);
     background: rgba(0,0,0,0.42);
     overflow: hidden;
+}
+
+body.theme-emoji-web .gif-slot {
+    display: block;
 }
 
 .gif-slot.compact iframe {
