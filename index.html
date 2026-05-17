@@ -292,6 +292,11 @@ body {
     animation: scroll 20s linear infinite;
 }
 
+.marquee b {
+    color: var(--accent-yellow);
+    font-family: var(--terminal-font);
+}
+
 @keyframes scroll {
     from { transform: translateX(0); }
     to { transform: translateX(-100%); }
@@ -368,7 +373,8 @@ h1 {
 }
 
 .palette-readout,
-.os-readout {
+.os-readout,
+.splash-readout {
     display: inline-block;
     margin: 0 4px 10px 4px;
     padding: 5px 8px;
@@ -377,6 +383,36 @@ h1 {
     color: var(--accent-yellow);
     font-size: 12px;
     font-weight: bold;
+}
+
+.splash-readout {
+    display: block;
+    width: fit-content;
+    max-width: 92%;
+    margin: 0 auto 12px auto;
+    color: #dffff5;
+}
+
+.theme-flash {
+    position: absolute;
+    left: 50%;
+    top: 12px;
+    z-index: 8;
+    transform: translateX(-50%);
+    padding: 7px 10px;
+    border: 3px outset #dffff5;
+    background: var(--accent-yellow);
+    color: #001b12;
+    font-size: 12px;
+    font-weight: bold;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.theme-flash.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(6px);
 }
 
 .control-row {
@@ -463,6 +499,22 @@ button,
 }
 
 .icon-art.note { transform: rotate(-4deg); }
+.icon-art.disk {
+    position: relative;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+}
+
+.icon-art.disk::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 7px;
+    height: 8px;
+    background: #00130d;
+    border: 2px inset #dffff5;
+}
+
 .icon-label { font-size: 12px; text-shadow: 1px 1px 0 #000; }
 
 .window-grid {
@@ -711,6 +763,28 @@ body.music-playing .volume-bars span:nth-child(6) { animation: barMove 0.22s eas
     border-left: 3px solid var(--cyan);
 }
 
+.file-list {
+    margin: 8px 0 0 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--terminal-font);
+    color: #aaffc7;
+}
+
+.file-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 6px 0;
+    padding: 6px 8px;
+    border: 2px dotted rgba(77,255,223,0.48);
+    background: rgba(0,0,0,0.22);
+}
+
+.file-type {
+    color: var(--accent-yellow);
+}
+
 .terminal-screen {
     min-height: 180px;
     max-height: 230px;
@@ -901,6 +975,30 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
         letter-spacing: 1px;
     }
 
+    .startup-box {
+        padding: 18px;
+    }
+
+    .startup-logo {
+        font-size: clamp(38px, 12vw, 64px);
+        overflow-wrap: anywhere;
+    }
+
+    .boot-lines {
+        font-size: 11px;
+    }
+
+    .startup-button,
+    .os-button,
+    .task-button,
+    .link-button {
+        min-height: 42px;
+    }
+
+    .terminal-input-row {
+        min-height: 50px;
+    }
+
     .logo-letter.bounce { transform: translateY(-10px) scale(1.08) rotate(-3deg); }
     .subtitle { font-size: 14px; }
     .window-grid { grid-template-columns: 1fr; }
@@ -933,6 +1031,12 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
         width: 62px;
     }
 
+    .file-list li {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 3px;
+    }
+
     body.warping .desktop { animation: desktopWarpMobile 0.34s ease-in-out infinite alternate; }
     body.warping .window { animation: windowWarpMobile 0.42s ease-in-out infinite alternate; }
 
@@ -953,7 +1057,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
     <div class="startup-box">
         <h2 class="startup-logo">squinkyDOS</h2>
         <div class="startup-subtitle">VERSION 173484</div>
-        <div class="boot-lines">
+        <div class="boot-lines" id="bootLines">
             MEMORY CHECK: OK<br>
             OLD COMPUTER DETECTED<br>
             LOADING PERSONAL WEB DISK<br>
@@ -983,7 +1087,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
 <div class="float-line three"></div>
 
 <div class="marquee">
-    <span>squinkyDOS 173484 :: VISITORS <b id="visitorCount">----</b> :: TODAY <b id="visitorToday">--</b> :: VIDEOS :: MOD NOTES :: MUSIC PLAYER :: OLD COMPUTER MODE</span>
+    <span>squinkyDOS 173484 :: LOCAL VISITS <b id="visitorCount">000173484</b> :: VIDEOS :: MOD NOTES :: MUSIC PLAYER :: OLD COMPUTER MODE</span>
 </div>
 
 <div class="desktop-wrap">
@@ -994,6 +1098,8 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
             <div class="subtitle">Running squinkyDOS from an old personal web computer.</div>
             <div class="os-readout" id="osReadout">squinkyDOS VERSION 173484</div>
             <div class="palette-readout" id="paletteReadout">PALETTE: GREEN-BLUE</div>
+            <div class="splash-readout" id="splashReadout">SPLASH: loading signal</div>
+            <div class="theme-flash" id="themeFlash">COLOR SHIFT READY</div>
             <div class="control-row">
                 <button class="os-button" id="musicButton">START MUSIC</button>
                 <button class="os-button" id="warpButton">SQUINK WARP</button>
@@ -1009,6 +1115,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
             <div class="desktop-icon" data-window="musicWindow"><div class="icon-art record-icon"></div><div class="icon-label">music</div></div>
             <div class="desktop-icon" data-window="terminalWindow"><div class="icon-art note"></div><div class="icon-label">terminal</div></div>
             <div class="desktop-icon" data-window="aboutWindow"><div class="icon-art folder"></div><div class="icon-label">about</div></div>
+            <div class="desktop-icon" data-window="fileWindow"><div class="icon-art disk"></div><div class="icon-label">local disk</div></div>
         </section>
 
         <section class="window-grid">
@@ -1091,6 +1198,25 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
                 </div>
             </article>
 
+            <article class="window" id="fileWindow">
+                <div class="titlebar">
+                    <span>LOCAL_DISK_A.DAT</span>
+                    <span class="window-buttons"><span class="fake-button green"></span><span class="fake-button blue"></span><span class="fake-button"></span></span>
+                </div>
+                <div class="window-content">
+                    <h2>File System</h2>
+                    <p class="small-text">A:/ index loaded. Personal web disk is readable.</p>
+                    <ul class="file-list">
+                        <li><span>SYSTEM</span><span class="file-type">DIR</span></li>
+                        <li><span>MOD</span><span class="file-type">DIR</span></li>
+                        <li><span>VIDEO</span><span class="file-type">DIR</span></li>
+                        <li><span>MUSIC</span><span class="file-type">DIR</span></li>
+                        <li><span>SIGNALS</span><span class="file-type">DIR</span></li>
+                        <li><span>README.TXT</span><span class="file-type">TXT</span></li>
+                    </ul>
+                </div>
+            </article>
+
             <article class="window" id="terminalWindow">
                 <div class="titlebar">
                     <span>SQUINK_TERMINAL.BAT</span>
@@ -1100,6 +1226,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
                     <div class="terminal-screen" id="terminalOutput">
                         <div class="terminal-line">BOOTING SQUINKYDOS...</div>
                         <div class="terminal-line">VERSION 173484 READY.</div>
+                        <div class="terminal-line">squinky.dev ONLINE.</div>
                         <div class="terminal-line">TYPE HELP FOR COMMANDS.</div>
                     </div>
                     <form id="terminalForm">
@@ -1115,6 +1242,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
                         <button class="os-button quick-command" data-command="music">music</button>
                         <button class="os-button quick-command" data-command="color">color</button>
                         <button class="os-button quick-command" data-command="squink">squink</button>
+                        <button class="os-button quick-command" data-command="splash">splash</button>
                         <button class="os-button quick-command" data-command="reset">reset</button>
                         <button class="os-button quick-command" data-command="terminate">terminate</button>
                     </div>
@@ -1128,14 +1256,53 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
             <button class="task-button" data-window="musicWindow">Music</button>
             <button class="task-button" data-window="terminalWindow">Terminal</button>
             <button class="task-button" data-window="aboutWindow">About</button>
+            <button class="task-button" data-window="fileWindow">Local Disk</button>
         </nav>
-        <div class="footer">squinkyDOS 173484</div>
+        <div class="footer">squinky.dev :: squinkyDOS 173484</div>
     </main>
 </div>
 
 <script>
 const LATEST_VIDEO_ID = "BBib-8NMGP8";
+const DOS_VERSION = "173484";
+const VISITOR_BASE = 173484;
+const VISITOR_STORAGE_KEY = "squinky.dev.localVisits";
 
+// Boot and flavor text pools
+const bootLinePool = [
+    "MEMORY CHECK: OK",
+    "OLD COMPUTER DETECTED",
+    "LOADING PERSONAL WEB DISK",
+    "MOUNTING SQUINKY.DEV",
+    "CHECKING GREEN SIGNAL",
+    "AUDIO DRIVER READY",
+    "CRT FILTER READY",
+    "TERMINAL READY",
+    "MOD TRACKER: UNDER CONSTRUCTION",
+    "VERSION 173484 CONFIRMED",
+    "LOCAL FILES INDEXED",
+    "STARTUP FANFARE QUEUED"
+];
+
+const splashTexts = [
+    "signal found",
+    "running on old hardware",
+    "personal web disk loaded",
+    "green light detected",
+    "iterator link unstable",
+    "version 173484",
+    "booted from mystery drive",
+    "cold computer weather",
+    "file system mostly okay",
+    "welcome back",
+    "squinky.dev online",
+    "do not remove the green wire",
+    "local disk humming",
+    "web terminal active",
+    "old monitor warmed up"
+];
+
+// Audio and animation state
 let audioCtx;
 let analyser;
 let masterGain;
@@ -1147,7 +1314,9 @@ let borderBoost = 32;
 let themeIndex = 0;
 let warpTimer = null;
 let isTerminated = false;
+let currentSplash = "";
 
+// Theme data
 const themes = [
     { name: "GREEN-BLUE", green: "#2cff6a", blue: "#2d8cff", cyan: "#4dffdf", yellow: "#f7ff6b", wallA: "#164d3d", wallB: "#06211f", wallC: "#010807" },
     { name: "SAINT GLOW", green: "#9cff57", blue: "#25b6ff", cyan: "#bcfff7", yellow: "#fff4a8", wallA: "#2f6b3a", wallB: "#103b2d", wallC: "#03120d" },
@@ -1155,10 +1324,12 @@ const themes = [
     { name: "ODD FILE", green: "#b6ff4d", blue: "#008cff", cyan: "#66ffcc", yellow: "#ffffff", wallA: "#4c5b1d", wallB: "#102d2e", wallC: "#060806" }
 ];
 
+// DOM references
 const startupScreen = document.getElementById("startupScreen");
 const terminatedScreen = document.getElementById("terminatedScreen");
 const enterSiteButton = document.getElementById("enterSiteButton");
 const rebootButton = document.getElementById("rebootButton");
+const bootLines = document.getElementById("bootLines");
 const logoText = "SQUINKY.DEV";
 const logo = document.getElementById("logo");
 const desktop = document.getElementById("desktop");
@@ -1170,9 +1341,11 @@ const terminalInput = document.getElementById("terminalInput");
 const terminalForm = document.getElementById("terminalForm");
 const record = document.getElementById("record");
 const paletteReadout = document.getElementById("paletteReadout");
+const splashReadout = document.getElementById("splashReadout");
+const themeFlash = document.getElementById("themeFlash");
 const visitorCount = document.getElementById("visitorCount");
-const visitorToday = document.getElementById("visitorToday");
 
+// Initial render
 logoText.split("").forEach(function(letter) {
     const span = document.createElement("span");
     span.className = "logo-letter";
@@ -1184,8 +1357,11 @@ const logoLetters = document.querySelectorAll(".logo-letter");
 const notes = [392, 523, 659, 523, 440, 587, 740, 587, 349, 440, 523, 440, 330, 392, 494, 392];
 
 document.getElementById("youtubeFrame").src = "https://www.youtube.com/embed/" + LATEST_VIDEO_ID;
+renderBootLines();
+rerollSplash(false);
 recordVisitorCount();
 
+// Event listeners
 enterSiteButton.addEventListener("click", enterSite);
 rebootButton.addEventListener("click", resetOS);
 document.addEventListener("keydown", function(event) {
@@ -1218,6 +1394,7 @@ terminalForm.addEventListener("submit", function(event) {
     if (command.length > 0) runCommand(command);
 });
 
+// Audio setup and OS entry
 function ensureAudio() {
     if (!audioCtx) setupAudio();
     if (audioCtx.state === "suspended") audioCtx.resume();
@@ -1241,48 +1418,80 @@ function addLine(text) {
     terminalOutput.scrollTop = terminalOutput.scrollHeight;
 }
 
-function recordVisitorCount() {
-    if (!visitorCount || !visitorToday) return;
+// Startup, splash, and local visit counter
+function renderBootLines() {
+    const count = randomInt(4, 6);
+    const chosenLines = shuffleArray(bootLinePool).slice(0, count);
+    bootLines.innerHTML = chosenLines.join("<br>");
+}
 
-    fetch("https://visitor.6developer.com/visit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            domain: "squinky.dev",
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            page_path: window.location.pathname,
-            page_title: document.title,
-            referrer: document.referrer
-        })
-    })
-    .then(function(response) {
-        if (!response.ok) throw new Error("Visitor counter unavailable");
-        return response.json();
-    })
-    .then(function(data) {
-        visitorCount.textContent = formatCounterNumber(data.totalCount);
-        visitorToday.textContent = formatCounterNumber(data.todayCount || 0);
-        addLine("VISITOR COUNTER ONLINE: " + formatCounterNumber(data.totalCount) + " TOTAL.");
-    })
-    .catch(function() {
-        visitorCount.textContent = "????";
-        visitorToday.textContent = "OFFLINE";
-        addLine("VISITOR COUNTER OFFLINE.");
-    });
+function rerollSplash(announce) {
+    let nextSplash = splashTexts[Math.floor(Math.random() * splashTexts.length)];
+
+    if (splashTexts.length > 1) {
+        while (nextSplash === currentSplash) {
+            nextSplash = splashTexts[Math.floor(Math.random() * splashTexts.length)];
+        }
+    }
+
+    currentSplash = nextSplash;
+    splashReadout.textContent = "SPLASH: " + currentSplash;
+
+    if (announce) {
+        addLine("SPLASH TEXT: " + currentSplash.toUpperCase() + ".");
+    }
+}
+
+function recordVisitorCount() {
+    if (!visitorCount) return;
+
+    let nextCount = VISITOR_BASE + 1;
+
+    try {
+        const storedCount = Number(localStorage.getItem(VISITOR_STORAGE_KEY));
+        const previousCount = Number.isFinite(storedCount) && storedCount >= VISITOR_BASE
+            ? storedCount
+            : VISITOR_BASE;
+
+        nextCount = previousCount + 1;
+        localStorage.setItem(VISITOR_STORAGE_KEY, String(nextCount));
+    } catch (error) {
+        nextCount = VISITOR_BASE;
+    }
+
+    visitorCount.textContent = formatCounterNumber(nextCount);
 }
 
 function formatCounterNumber(value) {
     const number = Number(value);
-    if (!Number.isFinite(number)) return "0";
-    return number.toLocaleString("en-US");
+    if (!Number.isFinite(number)) return "000173484";
+    return String(Math.floor(number)).padStart(9, "0");
 }
 
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function shuffleArray(items) {
+    const copy = items.slice();
+
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = temp;
+    }
+
+    return copy;
+}
+
+// Terminal commands
 function runCommand(rawCommand) {
-    const command = rawCommand.toLowerCase();
+    const command = rawCommand.toLowerCase().replace(/\s+/g, " ").trim();
     addLine("SQUINK> " + rawCommand.toUpperCase());
 
     if (command === "help") {
-        addLine("COMMANDS: VIDEO, MOD, MUSIC, ABOUT, SQUINK, COLOR, WAVE, RESET, REBOOT, TERMINATE, SHUTDOWN, CLEAR");
+        addLine("COMMANDS: HELP, VIDEO, MOD, MUSIC, ABOUT, FILES, SQUINK, COLOR, WAVE, SPLASH, STATUS, DIR, OPEN README, OPEN SIGNALS, VERSION, SITE, RESET, REBOOT, TERMINATE, SHUTDOWN, CLEAR");
     } else if (command === "video") {
         focusWindow("videoWindow");
         addLine("OPENED LATEST_VIDEO.URL.");
@@ -1295,10 +1504,27 @@ function runCommand(rawCommand) {
     } else if (command === "about") {
         focusWindow("aboutWindow");
         addLine("OPENED ABOUT_THIS_PLACE.TXT.");
+    } else if (command === "files" || command === "disk") {
+        focusWindow("fileWindow");
+        addLine("OPENED LOCAL_DISK_A.DAT.");
     } else if (command === "squink") {
         startRealityWarp();
     } else if (command === "color") {
         cycleTheme();
+    } else if (command === "splash") {
+        rerollSplash(true);
+    } else if (command === "status") {
+        printStatus();
+    } else if (command === "dir") {
+        printDirectory();
+    } else if (command === "open readme") {
+        addLine("README.TXT: squinky.dev is a personal web disk for videos, mod notes, music, and small experiments.");
+    } else if (command === "open signals") {
+        addLine("SIGNALS/: GREEN SIGNAL STEADY. ITERATOR LINK UNSTABLE BUT HARMLESS.");
+    } else if (command === "version") {
+        addLine("squinkyDOS VERSION " + DOS_VERSION + ".");
+    } else if (command === "site") {
+        addLine("squinky.dev");
     } else if (command === "wave") {
         borderBoost = 54;
         addLine("WAVE BORDER AMPLIFIER: HIGH.");
@@ -1318,6 +1544,26 @@ function runCommand(rawCommand) {
     }
 }
 
+function printStatus() {
+    const theme = themes[themeIndex];
+    addLine("squinkyDOS STATUS: RUNNING.");
+    addLine("VERSION: " + DOS_VERSION + ".");
+    addLine("PALETTE: " + theme.name + ".");
+    addLine("MUSIC: " + (isPlaying ? "PLAYING." : "MUTED."));
+    addLine("MOD TRACKER: UNDER CONSTRUCTION, 0%.");
+}
+
+function printDirectory() {
+    addLine("A:/");
+    addLine("SYSTEM/");
+    addLine("MOD/");
+    addLine("VIDEO/");
+    addLine("MUSIC/");
+    addLine("SIGNALS/");
+    addLine("README.TXT");
+}
+
+// Window focus and theme controls
 function focusWindow(id) {
     const target = document.getElementById(id);
     if (!target) return;
@@ -1336,12 +1582,23 @@ function cycleTheme() {
     document.documentElement.style.setProperty("--wall-a", theme.wallA);
     document.documentElement.style.setProperty("--wall-b", theme.wallB);
     document.documentElement.style.setProperty("--wall-c", theme.wallC);
-    paletteReadout.textContent = "PALETTE: " + theme.name;
+    paletteReadout.textContent = "PALETTE: " + theme.name + " [" + (themeIndex + 1) + "/" + themes.length + "]";
+    showThemeFlash("COLOR SHIFT: " + theme.name);
     addLine("COLOR SHIFT: " + theme.name + ".");
     document.body.style.filter = "saturate(1.45) brightness(1.08)";
     setTimeout(function() { document.body.style.filter = ""; }, 250);
 }
 
+function showThemeFlash(message) {
+    themeFlash.textContent = message;
+    themeFlash.classList.add("visible");
+
+    setTimeout(function() {
+        themeFlash.classList.remove("visible");
+    }, 900);
+}
+
+// OS lifecycle controls
 function resetOS() {
     ensureAudio();
     playResetSound();
@@ -1350,6 +1607,8 @@ function resetOS() {
     terminatedScreen.classList.remove("visible");
     startupScreen.classList.remove("hidden");
     startupScreen.classList.add("visible");
+    renderBootLines();
+    rerollSplash(false);
     isTerminated = false;
     borderBoost = 32;
     document.getElementById("musicButton").innerText = "START MUSIC";
@@ -1371,6 +1630,7 @@ function terminateOS() {
     addLine("SQUINKYDOS HALTED.");
 }
 
+// Squink Warp effect
 function startRealityWarp() {
     clearTimeout(warpTimer);
     ensureAudio();
@@ -1400,6 +1660,7 @@ function makeSquinkNote() {
     setTimeout(function() { note.remove(); }, 1900);
 }
 
+// Music player loop
 function toggleMusic() {
     ensureAudio();
     if (!isPlaying) {
@@ -1419,6 +1680,7 @@ function toggleMusic() {
     }
 }
 
+// Audio synthesis
 function setupAudio() {
     audioCtx = new AudioContext();
     analyser = audioCtx.createAnalyser();
@@ -1586,6 +1848,7 @@ function stopMusic() {
     isPlaying = false;
 }
 
+// Wave border visualizer
 function resizeBorderCanvas() {
     const rect = wrap.getBoundingClientRect();
     borderCanvas.width = rect.width + 68;
