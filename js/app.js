@@ -69,6 +69,7 @@ let analyser;
 let masterGain;
 let musicTimer = null;
 let animationFrame = null;
+let borderTimer = null;
 let step = 0;
 let isPlaying = false;
 let borderBoost = 32;
@@ -81,6 +82,8 @@ let depthFrame = null;
 let latestPointerEvent = null;
 let cachedBorderWidth = 0;
 let cachedBorderHeight = 0;
+let lastBorderDrawTime = 0;
+let lastActivityResetTime = 0;
 let screensaverActive = false;
 let isTerminated = false;
 let currentSplash = "";
@@ -202,7 +205,7 @@ terminalForm.addEventListener("submit", function(event) {
 
 guestbookForm.addEventListener("submit", submitGuestbookEntry);
 
-document.addEventListener("mousemove", updateDepthFromPointer);
+document.addEventListener("mousemove", updateDepthFromPointer, { passive: true });
 document.addEventListener("click", makeClickSpark);
 document.addEventListener("visibilitychange", handleVisibilityChange);
 ["mousemove", "mousedown", "keydown", "touchstart", "scroll"].forEach(function(eventName) {
@@ -213,7 +216,9 @@ resetScreensaverTimer();
 function handleVisibilityChange() {
     if (document.hidden) {
         cancelAnimationFrame(animationFrame);
+        clearTimeout(borderTimer);
         animationFrame = null;
+        borderTimer = null;
     } else {
         startWaveBorder();
         updateDynamicReadouts();
@@ -234,6 +239,7 @@ function enterSite() {
     if (ensureAudio()) playStartupFanfare();
     startupScreen.classList.add("hidden");
     startupScreen.classList.remove("visible");
+    startWaveBorder();
     addLine("SQUINKYDOS FANFARE COMPLETE.");
     addLine("SYSTEM ONLINE.");
     scheduleSystemEvent();
@@ -251,8 +257,13 @@ function addLine(text) {
 function noteUserActivity() {
     if (screensaverActive) {
         hideScreensaver();
+        resetScreensaverTimer();
+        return;
     }
 
+    const now = Date.now();
+    if (now - lastActivityResetTime < 1000) return;
+    lastActivityResetTime = now;
     resetScreensaverTimer();
 }
 
@@ -730,7 +741,7 @@ function setFilePreview(text) {
 
 // Parallax and depth effects
 function updateDepthFromPointer(event) {
-    if (screensaverActive) return;
+    if (screensaverActive || window.innerWidth <= 820) return;
 
     latestPointerEvent = event;
 
@@ -780,7 +791,10 @@ function loadPage(pageId) {
 
         driverLoader.classList.remove("visible");
         if (pageId === "guestbookPage") loadGuestbook();
-        resizeBorderCanvas();
+        if (pageId === "homePage") {
+            resizeBorderCanvas();
+            startWaveBorder();
+        }
         addLine("PAGE DRIVER LOADED: " + (labels[pageId] || pageId).toUpperCase() + ".");
         window.scrollTo({ top: 0, behavior: "smooth" });
     }, 1120);
@@ -1141,23 +1155,40 @@ function stopMusic() {
 // Wave border visualizer
 function resizeBorderCanvas() {
     const rect = wrap.getBoundingClientRect();
-    cachedBorderWidth = Math.round(rect.width + 68);
-    cachedBorderHeight = Math.round(rect.height + 68);
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+    const displayWidth = Math.round(rect.width + 68);
+    const displayHeight = Math.round(rect.height + 68);
+
+    cachedBorderWidth = Math.round(displayWidth * pixelRatio);
+    cachedBorderHeight = Math.round(displayHeight * pixelRatio);
     borderCanvas.width = cachedBorderWidth;
     borderCanvas.height = cachedBorderHeight;
+    borderCanvas.style.width = displayWidth + "px";
+    borderCanvas.style.height = displayHeight + "px";
+    borderCtx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 }
 
 window.addEventListener("resize", resizeBorderCanvas);
 resizeBorderCanvas();
-startWaveBorder();
 
 function startWaveBorder() {
-    if (animationFrame) return;
-    drawWaveBorder();
+    if (animationFrame || borderTimer) return;
+    lastBorderDrawTime = 0;
+    scheduleWaveBorder(0);
+}
+
+function scheduleWaveBorder(delay) {
+    clearTimeout(borderTimer);
+    borderTimer = setTimeout(function() {
+        borderTimer = null;
+        animationFrame = requestAnimationFrame(drawWaveBorder);
+    }, delay);
 }
 
 function drawWaveLine(startX, startY, endX, endY, outwardX, outwardY, dataArray, offset, force) {
-    const points = 120;
+    const points = window.innerWidth <= 820 ? 42 : 72;
     borderCtx.beginPath();
     for (let i = 0; i <= points; i++) {
         const t = i / points;
@@ -1175,9 +1206,31 @@ function drawWaveLine(startX, startY, endX, endY, outwardX, outwardY, dataArray,
 }
 
 function drawWaveBorder() {
-    animationFrame = requestAnimationFrame(drawWaveBorder);
-    const width = cachedBorderWidth || borderCanvas.width;
-    const height = cachedBorderHeight || borderCanvas.height;
+    animationFrame = null;
+
+    if (
+        document.hidden ||
+        isTerminated ||
+        !startupScreen.classList.contains("hidden") ||
+        homePage.classList.contains("hidden-view")
+    ) {
+        animationFrame = null;
+        return;
+    }
+
+    const now = performance.now();
+    const targetFrameMs = isPlaying ? 50 : 250;
+
+    if (now - lastBorderDrawTime < targetFrameMs) {
+        scheduleWaveBorder(targetFrameMs - (now - lastBorderDrawTime));
+        return;
+    }
+
+    lastBorderDrawTime = now;
+
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+    const width = (cachedBorderWidth || borderCanvas.width) / pixelRatio;
+    const height = (cachedBorderHeight || borderCanvas.height) / pixelRatio;
     const padding = 28;
     borderCtx.clearRect(0, 0, width, height);
 
@@ -1188,6 +1241,7 @@ function drawWaveBorder() {
         borderCtx.shadowColor = "#2cff6a";
         borderCtx.strokeRect(padding, padding, width - padding * 2, height - padding * 2);
         borderCtx.shadowBlur = 0;
+        scheduleWaveBorder(targetFrameMs);
         return;
     }
 
@@ -1205,4 +1259,5 @@ function drawWaveBorder() {
     drawWaveLine(width - padding, height - padding, padding, height - padding, 0, 1, dataArray, 256, borderBoost);
     drawWaveLine(padding, height - padding, padding, padding, -1, 0, dataArray, 384, borderBoost);
     borderCtx.shadowBlur = 0;
+    scheduleWaveBorder(targetFrameMs);
 }
