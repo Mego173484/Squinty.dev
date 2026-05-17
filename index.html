@@ -1024,7 +1024,7 @@ body.music-playing .volume-bars span:nth-child(6) { animation: barMove 0.22s eas
     overflow: hidden;
     background:
         repeating-linear-gradient(to bottom, rgba(255,255,255,0.04), rgba(255,255,255,0.04) 1px, transparent 1px, transparent 5px),
-        radial-gradient(circle at center, rgba(44,255,106,0.13), transparent 34%),
+        radial-gradient(circle at center, rgba(44,255,106,0.16), transparent 32%),
         rgba(0, 7, 4, 0.94);
 }
 
@@ -1032,27 +1032,142 @@ body.music-playing .volume-bars span:nth-child(6) { animation: barMove 0.22s eas
     display: flex;
 }
 
+.screensaver::before,
+.screensaver::after {
+    content: "";
+    position: absolute;
+    inset: -22%;
+    pointer-events: none;
+}
+
+.screensaver::before {
+    background:
+        repeating-radial-gradient(circle at center, transparent 0 28px, rgba(77,255,223,0.18) 30px 32px),
+        conic-gradient(from 0deg, transparent, rgba(44,255,106,0.28), transparent, rgba(45,140,255,0.22), transparent);
+    mix-blend-mode: screen;
+    animation: saverSpin 18s linear infinite, saverPulse 4.5s ease-in-out infinite alternate;
+}
+
+.screensaver::after {
+    background-image:
+        linear-gradient(rgba(77,255,223,0.16) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(44,255,106,0.14) 2px, transparent 2px);
+    background-size: 86px 86px;
+    transform: perspective(650px) rotateX(62deg) translateY(18vh);
+    animation: saverGrid 6s linear infinite;
+    opacity: 0.45;
+}
+
+.screensaver-core {
+    position: absolute;
+    width: min(54vw, 430px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 3px dotted rgba(77,255,223,0.75);
+    box-shadow:
+        0 0 28px var(--cyan),
+        inset 0 0 42px rgba(44,255,106,0.32);
+    animation: saverOrbit 7s ease-in-out infinite alternate;
+}
+
+.screensaver-core::before,
+.screensaver-core::after {
+    content: "";
+    position: absolute;
+    inset: 13%;
+    border-radius: 50%;
+    border: 3px ridge var(--green);
+    box-shadow: 0 0 24px var(--green);
+    animation: saverRing 5.2s ease-in-out infinite alternate;
+}
+
+.screensaver-core::after {
+    inset: 31%;
+    border-color: var(--accent-yellow);
+    animation-delay: -1.3s;
+}
+
 .screensaver-logo {
+    position: relative;
+    z-index: 2;
     color: var(--green);
     font-size: clamp(42px, 11vw, 116px);
     font-weight: bold;
     letter-spacing: 2px;
     text-shadow: 0 0 18px var(--green), 0 0 48px var(--cyan), 3px 3px 0 #00130d;
-    animation: saverDrift 9s ease-in-out infinite alternate, startupLogoPulse 1.8s ease-in-out infinite alternate;
+    animation: saverLogoFloat 8s ease-in-out infinite alternate, startupLogoPulse 1.8s ease-in-out infinite alternate;
 }
 
 .screensaver-text {
     position: absolute;
+    z-index: 2;
     bottom: 10%;
     color: #dffff5;
     font-family: var(--terminal-font);
     font-size: 13px;
     text-align: center;
+    text-shadow: 0 0 10px var(--green);
 }
 
-@keyframes saverDrift {
-    from { transform: translate(-18vw, -10vh) rotate(-2deg); }
-    to { transform: translate(18vw, 12vh) rotate(2deg); }
+.saver-signal {
+    position: absolute;
+    z-index: 2;
+    color: var(--accent-yellow);
+    font-family: var(--terminal-font);
+    font-size: 12px;
+    text-shadow: 0 0 10px var(--accent-yellow);
+    animation: saverSignal 10s ease-in-out infinite alternate;
+}
+
+.saver-signal.one {
+    left: 10%;
+    top: 18%;
+}
+
+.saver-signal.two {
+    right: 9%;
+    top: 62%;
+    animation-delay: -2.4s;
+}
+
+.saver-signal.three {
+    left: 28%;
+    bottom: 18%;
+    animation-delay: -4.1s;
+}
+
+@keyframes saverSpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes saverPulse {
+    from { opacity: 0.42; filter: hue-rotate(0deg); }
+    to { opacity: 0.8; filter: hue-rotate(38deg); }
+}
+
+@keyframes saverGrid {
+    from { background-position: 0 0; }
+    to { background-position: 0 86px; }
+}
+
+@keyframes saverOrbit {
+    from { transform: translate(-8vw, -4vh) rotate(-8deg) scale(0.94); }
+    to { transform: translate(8vw, 5vh) rotate(8deg) scale(1.06); }
+}
+
+@keyframes saverRing {
+    from { transform: rotate(0deg) scale(0.88); opacity: 0.58; }
+    to { transform: rotate(45deg) scale(1.12); opacity: 0.95; }
+}
+
+@keyframes saverLogoFloat {
+    from { transform: translate(-12vw, -8vh) rotate(-2deg); }
+    to { transform: translate(12vw, 9vh) rotate(2deg); }
+}
+
+@keyframes saverSignal {
+    from { transform: translateY(-18px) translateX(-8px); opacity: 0.38; }
+    to { transform: translateY(18px) translateX(12px); opacity: 1; }
 }
 
 body.warping .desktop {
@@ -1228,7 +1343,11 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
 </div>
 
 <div class="screensaver" id="screensaver">
+    <div class="screensaver-core"></div>
     <div class="screensaver-logo">SQUINKY.DEV</div>
+    <div class="saver-signal one">SIGNAL FOUND</div>
+    <div class="saver-signal two">173484</div>
+    <div class="saver-signal three">GREEN CHANNEL</div>
     <div class="screensaver-text">screensaver active<br>move / tap / press any key to return</div>
 </div>
 
