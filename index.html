@@ -18,6 +18,10 @@
     --wall-c: #010807;
     --font: Verdana, Tahoma, Arial, sans-serif;
     --terminal-font: "Courier New", monospace;
+    --parallax-x: 0px;
+    --parallax-y: 0px;
+    --tilt-x: 0deg;
+    --tilt-y: 0deg;
 }
 
 * { box-sizing: border-box; }
@@ -30,6 +34,37 @@ body {
     color: var(--text);
     background: #00120d;
     transition: filter 0.25s ease;
+}
+
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    pointer-events: none;
+}
+
+body::before {
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.045), rgba(255,255,255,0.045) 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 4px);
+    mix-blend-mode: screen;
+    opacity: 0.22;
+    animation: crtFlicker 4.8s steps(12) infinite;
+}
+
+body::after {
+    background:
+        radial-gradient(circle at center, transparent 54%, rgba(0,0,0,0.26) 100%),
+        linear-gradient(90deg, rgba(45,140,255,0.035), transparent 18%, transparent 82%, rgba(44,255,106,0.035));
+}
+
+@keyframes crtFlicker {
+    0%, 100% { opacity: 0.18; }
+    8% { opacity: 0.25; }
+    10% { opacity: 0.16; }
+    42% { opacity: 0.23; }
+    46% { opacity: 0.2; }
+    74% { opacity: 0.27; }
 }
 
 .startup-screen {
@@ -223,8 +258,8 @@ body {
     z-index: -5;
     overflow: hidden;
     background:
-        radial-gradient(circle at 20% 25%, rgba(44,255,106,0.16), transparent 18%),
-        radial-gradient(circle at 70% 35%, rgba(45,140,255,0.16), transparent 20%),
+        radial-gradient(circle at calc(20% + var(--parallax-x)) calc(25% + var(--parallax-y)), rgba(44,255,106,0.16), transparent 18%),
+        radial-gradient(circle at calc(70% - var(--parallax-x)) calc(35% - var(--parallax-y)), rgba(45,140,255,0.16), transparent 20%),
         radial-gradient(circle at center, var(--wall-a) 0%, var(--wall-b) 48%, var(--wall-c) 100%);
 }
 
@@ -234,7 +269,7 @@ body {
     inset: -20%;
     background-image: linear-gradient(rgba(77,255,223,0.13) 2px, transparent 2px), linear-gradient(90deg, rgba(44,255,106,0.13) 2px, transparent 2px);
     background-size: 74px 74px;
-    transform: rotate(-2deg);
+    transform: translate(var(--parallax-x), var(--parallax-y)) rotate(-2deg);
     animation: gridDrift 14s linear infinite;
 }
 
@@ -265,8 +300,8 @@ body {
 }
 
 .float-line.one { top: 13%; left: 6%; transform: rotate(17deg); }
-.float-line.two { top: 58%; right: 4%; width: 420px; transform: rotate(-12deg); animation-duration: 13s; }
-.float-line.three { top: 80%; left: 18%; width: 260px; transform: rotate(33deg); animation-duration: 15s; }
+.float-line.two { top: 58%; right: 4%; width: 420px; transform: translate(calc(var(--parallax-x) * -0.8), calc(var(--parallax-y) * 0.4)) rotate(-12deg); animation-duration: 13s; }
+.float-line.three { top: 80%; left: 18%; width: 260px; transform: translate(calc(var(--parallax-x) * 0.6), calc(var(--parallax-y) * -0.7)) rotate(33deg); animation-duration: 15s; }
 
 @keyframes floatLine {
     from { translate: -20px -6px; filter: blur(0px); }
@@ -307,6 +342,7 @@ body {
     width: 980px;
     max-width: 94%;
     margin: 34px auto 48px auto;
+    perspective: 1200px;
 }
 
 #waveBorder {
@@ -326,6 +362,18 @@ body {
     border: 4px ridge var(--cyan);
     box-shadow: 0 0 18px var(--cyan), 0 0 42px rgba(44,255,106,0.7), inset 0 0 40px rgba(0,0,0,0.55);
     overflow: hidden;
+    transform-style: preserve-3d;
+    transition: transform 0.18s ease, box-shadow 0.25s ease;
+    animation: desktopGlow 3.6s ease-in-out infinite alternate;
+}
+
+body:not(.warping) .desktop {
+    transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+}
+
+@keyframes desktopGlow {
+    from { box-shadow: 0 0 18px var(--cyan), 0 0 42px rgba(44,255,106,0.62), inset 0 0 40px rgba(0,0,0,0.55); }
+    to { box-shadow: 0 0 24px var(--cyan), 0 0 58px rgba(44,255,106,0.86), inset 0 0 48px rgba(77,255,223,0.08); }
 }
 
 .desktop::before {
@@ -465,11 +513,13 @@ button,
     color: var(--text);
     text-align: center;
     cursor: pointer;
+    transition: transform 0.16s ease, filter 0.16s ease, background 0.16s ease;
 }
 
 .desktop-icon:hover {
     border: 2px dotted var(--cyan);
     background: rgba(255,255,255,0.08);
+    transform: translateY(-2px) rotateX(8deg);
 }
 
 .icon-art {
@@ -534,6 +584,13 @@ button,
     box-shadow: 6px 6px 0 rgba(0,0,0,0.35), 0 0 20px rgba(77,255,223,0.42);
     text-align: left;
     overflow: hidden;
+    transform-style: preserve-3d;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+body:not(.warping) .window:hover {
+    transform: translateY(-2px) rotateX(1deg) rotateY(-1deg);
+    filter: brightness(1.05);
 }
 
 .window.active {
@@ -771,18 +828,43 @@ body.music-playing .volume-bars span:nth-child(6) { animation: barMove 0.22s eas
     color: #aaffc7;
 }
 
-.file-list li {
+.file-row {
     display: flex;
     justify-content: space-between;
+    width: 100%;
     gap: 12px;
     margin: 6px 0;
     padding: 6px 8px;
+    color: #aaffc7;
+    font: inherit;
+    text-align: left;
     border: 2px dotted rgba(77,255,223,0.48);
     background: rgba(0,0,0,0.22);
+    cursor: pointer;
+}
+
+.file-row:hover,
+.file-row:focus-visible {
+    outline: none;
+    border-color: var(--accent-yellow);
+    background: rgba(77,255,223,0.16);
+    color: #ffffff;
 }
 
 .file-type {
     color: var(--accent-yellow);
+}
+
+.file-preview {
+    min-height: 72px;
+    margin-top: 10px;
+    padding: 9px;
+    border: 3px inset var(--green);
+    background: rgba(0,0,0,0.4);
+    color: #aaffc7;
+    font-family: var(--terminal-font);
+    font-size: 12px;
+    line-height: 1.45;
 }
 
 .terminal-screen {
@@ -1031,10 +1113,14 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
         width: 62px;
     }
 
-    .file-list li {
+    .file-row {
         align-items: flex-start;
         flex-direction: column;
         gap: 3px;
+    }
+
+    body:not(.warping) .desktop {
+        transform: none;
     }
 
     body.warping .desktop { animation: desktopWarpMobile 0.34s ease-in-out infinite alternate; }
@@ -1087,7 +1173,7 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
 <div class="float-line three"></div>
 
 <div class="marquee">
-    <span>squinkyDOS 173484 :: LOCAL VISITS <b id="visitorCount">000173484</b> :: VIDEOS :: MOD NOTES :: MUSIC PLAYER :: OLD COMPUTER MODE</span>
+    <span>squinkyDOS 173484 :: REAL VISITS <b id="visitorCount">----</b> :: TODAY <b id="visitorToday">--</b> :: <b id="counterMode">SYNCING</b> :: VIDEOS :: MOD NOTES :: MUSIC PLAYER :: OLD COMPUTER MODE</span>
 </div>
 
 <div class="desktop-wrap">
@@ -1207,13 +1293,14 @@ body.warping .float-line { animation-duration: 1s; opacity: 0.9; }
                     <h2>File System</h2>
                     <p class="small-text">A:/ index loaded. Personal web disk is readable.</p>
                     <ul class="file-list">
-                        <li><span>SYSTEM</span><span class="file-type">DIR</span></li>
-                        <li><span>MOD</span><span class="file-type">DIR</span></li>
-                        <li><span>VIDEO</span><span class="file-type">DIR</span></li>
-                        <li><span>MUSIC</span><span class="file-type">DIR</span></li>
-                        <li><span>SIGNALS</span><span class="file-type">DIR</span></li>
-                        <li><span>README.TXT</span><span class="file-type">TXT</span></li>
+                        <li><button class="file-row" type="button" data-file="SYSTEM"><span>SYSTEM</span><span class="file-type">DIR</span></button></li>
+                        <li><button class="file-row" type="button" data-file="MOD"><span>MOD</span><span class="file-type">DIR</span></button></li>
+                        <li><button class="file-row" type="button" data-file="VIDEO"><span>VIDEO</span><span class="file-type">DIR</span></button></li>
+                        <li><button class="file-row" type="button" data-file="MUSIC"><span>MUSIC</span><span class="file-type">DIR</span></button></li>
+                        <li><button class="file-row" type="button" data-file="SIGNALS"><span>SIGNALS</span><span class="file-type">DIR</span></button></li>
+                        <li><button class="file-row" type="button" data-file="README"><span>README.TXT</span><span class="file-type">TXT</span></button></li>
                     </ul>
+                    <div class="file-preview" id="filePreview">SELECT FILE FROM A:/</div>
                 </div>
             </article>
 
@@ -1344,6 +1431,9 @@ const paletteReadout = document.getElementById("paletteReadout");
 const splashReadout = document.getElementById("splashReadout");
 const themeFlash = document.getElementById("themeFlash");
 const visitorCount = document.getElementById("visitorCount");
+const visitorToday = document.getElementById("visitorToday");
+const counterMode = document.getElementById("counterMode");
+const filePreview = document.getElementById("filePreview");
 
 // Initial render
 logoText.split("").forEach(function(letter) {
@@ -1383,6 +1473,10 @@ document.querySelectorAll("[data-command]").forEach(function(button) {
     button.addEventListener("click", function() { runCommand(button.dataset.command); });
 });
 
+document.querySelectorAll("[data-file]").forEach(function(button) {
+    button.addEventListener("click", function() { openFile(button.dataset.file); });
+});
+
 document.querySelector(".terminal-input-row").addEventListener("click", function() {
     terminalInput.focus();
 });
@@ -1393,6 +1487,8 @@ terminalForm.addEventListener("submit", function(event) {
     terminalInput.value = "";
     if (command.length > 0) runCommand(command);
 });
+
+document.addEventListener("mousemove", updateDepthFromPointer);
 
 // Audio setup and OS entry
 function ensureAudio() {
@@ -1443,8 +1539,51 @@ function rerollSplash(announce) {
 }
 
 function recordVisitorCount() {
-    if (!visitorCount) return;
+    if (!visitorCount || !visitorToday || !counterMode) return;
 
+    fetch("https://visitor.6developer.com/visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            domain: "squinky.dev",
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            page_path: window.location.pathname,
+            page_title: document.title,
+            referrer: document.referrer
+        })
+    })
+    .then(function(response) {
+        if (!response.ok) throw new Error("Counter unavailable");
+        return response.json();
+    })
+    .then(function(data) {
+        visitorCount.textContent = formatCounterNumber(data.totalCount);
+        visitorToday.textContent = formatTodayNumber(data.todayCount);
+        counterMode.textContent = "LIVE";
+        addLine("REAL VISITOR COUNTER ONLINE: " + formatCounterNumber(data.totalCount) + " TOTAL.");
+    })
+    .catch(function() {
+        const fallbackCount = recordFallbackVisit();
+        visitorCount.textContent = formatCounterNumber(fallbackCount);
+        visitorToday.textContent = "LOCAL";
+        counterMode.textContent = "OFFLINE CACHE";
+        addLine("REAL VISITOR COUNTER OFFLINE. LOCAL CACHE DISPLAYED.");
+    });
+}
+
+function formatCounterNumber(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return "000173484";
+    return String(Math.floor(number)).padStart(8, "0");
+}
+
+function formatTodayNumber(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return "--";
+    return String(Math.floor(number)).padStart(3, "0");
+}
+
+function recordFallbackVisit() {
     let nextCount = VISITOR_BASE + 1;
 
     try {
@@ -1459,13 +1598,7 @@ function recordVisitorCount() {
         nextCount = VISITOR_BASE;
     }
 
-    visitorCount.textContent = formatCounterNumber(nextCount);
-}
-
-function formatCounterNumber(value) {
-    const number = Number(value);
-    if (!Number.isFinite(number)) return "000173484";
-    return String(Math.floor(number)).padStart(9, "0");
+    return nextCount;
 }
 
 function randomInt(min, max) {
@@ -1518,9 +1651,11 @@ function runCommand(rawCommand) {
     } else if (command === "dir") {
         printDirectory();
     } else if (command === "open readme") {
-        addLine("README.TXT: squinky.dev is a personal web disk for videos, mod notes, music, and small experiments.");
+        focusWindow("fileWindow");
+        openFile("README");
     } else if (command === "open signals") {
-        addLine("SIGNALS/: GREEN SIGNAL STEADY. ITERATOR LINK UNSTABLE BUT HARMLESS.");
+        focusWindow("fileWindow");
+        openFile("SIGNALS");
     } else if (command === "version") {
         addLine("squinkyDOS VERSION " + DOS_VERSION + ".");
     } else if (command === "site") {
@@ -1561,6 +1696,59 @@ function printDirectory() {
     addLine("MUSIC/");
     addLine("SIGNALS/");
     addLine("README.TXT");
+}
+
+function openFile(fileName) {
+    const actions = {
+        SYSTEM: function() {
+            setFilePreview("SYSTEM/: squinkyDOS core files loaded. CRT filter, audio driver, and terminal hooks are active.");
+            addLine("A:/SYSTEM OPENED. CRT FILTER ACTIVE.");
+        },
+        MOD: function() {
+            setFilePreview("MOD/: Fallen Grace tracker found. Status remains under construction at 0%.");
+            focusWindow("modWindow");
+            addLine("A:/MOD OPENED. TRACKER STATUS: 0%.");
+        },
+        VIDEO: function() {
+            setFilePreview("VIDEO/: latest upload shortcut points to LATEST_VIDEO.URL.");
+            focusWindow("videoWindow");
+            addLine("A:/VIDEO OPENED. LATEST_VIDEO.URL FOCUSED.");
+        },
+        MUSIC: function() {
+            setFilePreview("MUSIC/: square synth loop and vinyl animation are ready.");
+            focusWindow("musicWindow");
+            addLine("A:/MUSIC OPENED. MUSIC_PLAYER.EXE FOCUSED.");
+        },
+        SIGNALS: function() {
+            setFilePreview("SIGNALS/: green signal steady. Iterator link unstable, harmless, and slightly warm.");
+            addLine("A:/SIGNALS OPENED. GREEN SIGNAL STEADY.");
+        },
+        README: function() {
+            setFilePreview("README.TXT: squinky.dev is a personal web disk for videos, mod notes, music, and experiments.");
+            addLine("README.TXT OPENED.");
+        }
+    };
+
+    if (actions[fileName]) {
+        actions[fileName]();
+    }
+}
+
+function setFilePreview(text) {
+    filePreview.textContent = text;
+}
+
+// Parallax and depth effects
+function updateDepthFromPointer(event) {
+    const width = window.innerWidth || 1;
+    const height = window.innerHeight || 1;
+    const x = (event.clientX / width - 0.5);
+    const y = (event.clientY / height - 0.5);
+
+    document.documentElement.style.setProperty("--parallax-x", (x * 18).toFixed(2) + "px");
+    document.documentElement.style.setProperty("--parallax-y", (y * 14).toFixed(2) + "px");
+    document.documentElement.style.setProperty("--tilt-y", (x * 2.2).toFixed(2) + "deg");
+    document.documentElement.style.setProperty("--tilt-x", (y * -1.6).toFixed(2) + "deg");
 }
 
 // Window focus and theme controls
