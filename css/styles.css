@@ -362,7 +362,7 @@ body::after {
     width: calc(100% + 68px);
     height: calc(100% + 68px);
     pointer-events: none;
-    z-index: 4;
+    z-index: 0;
 }
 
 .desktop {
@@ -587,8 +587,73 @@ body.theme-emoji-web .desktop {
 }
 
 body.theme-emoji-web #waveBorder {
-    opacity: 0.42;
+    display: block;
+    opacity: 0.88;
     mix-blend-mode: screen;
+}
+
+body.theme-emoji-web .desktop::before {
+    background:
+        radial-gradient(circle at 9% 12%, rgba(255,255,255,0.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 74% 18%, rgba(255,255,255,0.82) 0 1px, transparent 2px),
+        radial-gradient(circle at 28% 68%, rgba(255,255,255,0.7) 0 1px, transparent 2px),
+        radial-gradient(circle at 86% 72%, rgba(255,255,255,0.76) 0 1px, transparent 2px);
+    background-size: 160px 130px, 220px 190px, 180px 170px, 260px 210px;
+    opacity: 0.75;
+}
+
+body.theme-emoji-web .desktop::after {
+    content: "";
+    position: absolute;
+    left: -20%;
+    right: -20%;
+    bottom: -18%;
+    height: 72%;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        repeating-radial-gradient(ellipse at 50% 112%, transparent 0 28px, rgba(255,77,243,0.56) 29px 32px, transparent 33px 58px),
+        repeating-radial-gradient(ellipse at 50% 112%, transparent 0 48px, rgba(47,255,255,0.42) 49px 51px, transparent 52px 88px),
+        repeating-linear-gradient(70deg, transparent 0 58px, rgba(255,242,0,0.36) 59px 61px, transparent 62px 116px),
+        repeating-linear-gradient(110deg, transparent 0 58px, rgba(57,255,20,0.28) 59px 61px, transparent 62px 116px);
+    background-size: 100% 120px, 100% 180px, 160px 100%, 160px 100%;
+    filter: drop-shadow(0 0 10px #ff4df3);
+    opacity: 0.62;
+    transform: translate3d(0, 0, 0);
+    will-change: background-position, transform;
+    animation: desktopSynthwave 3.4s linear infinite;
+    transition: opacity 0.08s ease, filter 0.08s ease, transform 0.08s ease;
+}
+
+body.theme-emoji-web.music-playing .desktop::after {
+    animation-duration: 2.1s;
+    opacity: 0.72;
+}
+
+body.theme-emoji-web.music-beat .desktop::after {
+    opacity: 0.95;
+    filter: drop-shadow(0 0 16px #ff4df3) drop-shadow(0 0 18px #2fffff) brightness(1.28);
+    transform: translate3d(0, -10px, 0) skewY(-2deg) scaleY(1.04);
+}
+
+body.theme-emoji-web.music-playing .wallpaper::after {
+    animation-duration: 3.2s;
+}
+
+body.theme-emoji-web.music-beat .wallpaper::after {
+    opacity: 1;
+    filter: brightness(1.22) saturate(1.25);
+}
+
+@keyframes desktopSynthwave {
+    from {
+        background-position: 0 0, 0 0, 0 0, 0 0;
+        transform: translate3d(0, 0, 0) skewY(-2deg);
+    }
+    to {
+        background-position: 0 120px, 0 180px, 160px 0, -160px 0;
+        transform: translate3d(0, 16px, 0) skewY(-2deg);
+    }
 }
 
 body.theme-emoji-web .wallpaper {

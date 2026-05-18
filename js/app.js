@@ -1242,7 +1242,10 @@ function pulseRecord() {
 
 function pulseInterface() {
     document.body.classList.add("music-beat");
-    setTimeout(function() { document.body.classList.remove("music-beat"); }, 120);
+    clearTimeout(pulseInterface.timer);
+    pulseInterface.timer = setTimeout(function() {
+        document.body.classList.remove("music-beat");
+    }, 120);
 }
 
 function playNote(freq, duration) {
