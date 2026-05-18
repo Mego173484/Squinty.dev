@@ -42,6 +42,17 @@ const webBootLinePool = [
     "WEB PLANET ORBIT: STABLE"
 ];
 
+const c64BootLinePool = [
+    "**** COMMODORE 64 BASIC V2 ****",
+    "64K RAM SYSTEM 38911 BASIC BYTES FREE",
+    "READY.",
+    "LOAD \"SQUINKY\",8,1",
+    "SEARCHING FOR SQUINKY",
+    "LOADING",
+    "READY.",
+    "RUN"
+];
+
 const splashTexts = [
     "signal found",
     "running on old hardware",
@@ -76,6 +87,14 @@ const webEvents = [
     "WEB EVENT: GUESTBOOK STARS ARE BLINKING.",
     "WEB EVENT: OLD INTERNET RAINBOW UPDATED.",
     "WEB EVENT: NETSCAPE TOUR GUIDE WAVES HELLO."
+];
+
+const c64Events = [
+    "C64 EVENT: READY.",
+    "C64 EVENT: LOAD \"MUSIC\",8.",
+    "C64 EVENT: SID VOICE 2 WARM.",
+    "C64 EVENT: POKE 53280,6.",
+    "C64 EVENT: DATA LINES COLOR CYCLING."
 ];
 
 const blockedWords = [
@@ -206,6 +225,7 @@ subtitle.appendChild(themeExtra);
 const logoLetters = document.querySelectorAll(".logo-letter");
 const notes = [392, 523, 659, 523, 440, 587, 740, 587, 349, 440, 523, 440, 330, 392, 494, 392];
 const webNotes = [523, 659, 784, 988, 880, 784, 659, 587, 659, 784, 1047, 988, 784, 659, 587, 523];
+const c64Notes = [196, 262, 196, 330, 262, 392, 330, 262, 220, 294, 220, 349, 294, 440, 349, 294];
 
 themes.forEach(function(theme, index) {
     const button = document.createElement("button");
@@ -339,8 +359,8 @@ function enterSite() {
     startupScreen.classList.add("hidden");
     startupScreen.classList.remove("visible");
     startWaveBorder();
-    addLine(isEmojiWebTheme() ? "SQUINKY WORLD PAGE LOADED." : "SQUINKYDOS FANFARE COMPLETE.");
-    addLine(isEmojiWebTheme() ? "WELCOME, WEB TRAVELER." : "SYSTEM ONLINE.");
+    addLine(isC64Theme() ? "READY." : (isEmojiWebTheme() ? "SQUINKY WORLD PAGE LOADED." : "SQUINKYDOS FANFARE COMPLETE."));
+    addLine(isC64Theme() ? "RUN" : (isEmojiWebTheme() ? "WELCOME, WEB TRAVELER." : "SYSTEM ONLINE."));
     scheduleSystemEvent();
 }
 
@@ -422,6 +442,13 @@ function updateDynamicReadouts() {
     const seconds = uptimeSeconds % 60;
     const signal = 72 + Math.floor(Math.sin(Date.now() / 1400) * 12) + Math.floor(Math.random() * 5);
 
+    if (isC64Theme()) {
+        clockReadout.textContent = "TI$ " + now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        uptimeReadout.textContent = "BLOCKS " + String(38911 - (uptimeSeconds % 900)).padStart(5, "0");
+        signalReadout.textContent = "POKE " + Math.max(44, Math.min(99, signal));
+        return;
+    }
+
     if (isEmojiWebTheme()) {
         clockReadout.textContent = "LOCAL TIME " + now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         uptimeReadout.textContent = "WEB TOUR " + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
@@ -438,7 +465,7 @@ function scheduleSystemEvent() {
     clearTimeout(systemEventTimer);
     systemEventTimer = setTimeout(function() {
         if (!isTerminated && startupScreen.classList.contains("hidden") && !screensaverActive) {
-            const events = isEmojiWebTheme() ? webEvents : systemEvents;
+            const events = isC64Theme() ? c64Events : (isEmojiWebTheme() ? webEvents : systemEvents);
             addLine(events[Math.floor(Math.random() * events.length)]);
         }
 
@@ -463,7 +490,8 @@ function makeClickSpark(event) {
 // Startup, splash, and local visit counter
 function renderBootLines() {
     const count = randomInt(4, 6);
-    const chosenLines = shuffleArray(isEmojiWebTheme() ? webBootLinePool : bootLinePool).slice(0, count);
+    const pool = isC64Theme() ? c64BootLinePool : (isEmojiWebTheme() ? webBootLinePool : bootLinePool);
+    const chosenLines = isC64Theme() ? pool : shuffleArray(pool).slice(0, count);
     bootLines.innerHTML = chosenLines.join("<br>");
 }
 
@@ -477,7 +505,7 @@ function rerollSplash(announce) {
     }
 
     currentSplash = nextSplash;
-    splashReadout.textContent = isEmojiWebTheme() ? "WEB PAGE: SPACE SONG LOADED" : "SPLASH: " + currentSplash;
+    splashReadout.textContent = isC64Theme() ? "READY." : (isEmojiWebTheme() ? "WEB PAGE: SPACE SONG LOADED" : "SPLASH: " + currentSplash);
 
     if (announce) {
         addLine("SPLASH TEXT: " + currentSplash.toUpperCase() + ".");
@@ -999,6 +1027,10 @@ function isEmojiWebTheme() {
     return themes[themeIndex] && themes[themeIndex].className === "theme-emoji-web";
 }
 
+function isC64Theme() {
+    return themes[themeIndex] && themes[themeIndex].className === "theme-c64";
+}
+
 function setMarqueeHtml(html) {
     marqueeText.innerHTML = html;
     visitorCount = document.getElementById("visitorCount");
@@ -1006,8 +1038,50 @@ function setMarqueeHtml(html) {
     counterMode = document.getElementById("counterMode");
 }
 
+function showC64LoadOverlay() {
+    driverTitle.textContent = "LOAD \"SQUINKY\",8,1";
+    driverLine.textContent = "SEARCHING FOR SQUINKY... LOADING... READY. RUN";
+    driverLoader.classList.add("visible", "c64-load");
+
+    setTimeout(function() {
+        driverLine.textContent = "FOUND SQUINKY  PRG  64 BLOCKS";
+    }, 650);
+
+    setTimeout(function() {
+        driverLine.textContent = "READY. RUN";
+    }, 1400);
+
+    setTimeout(function() {
+        driverLoader.classList.remove("visible", "c64-load");
+    }, 2300);
+}
+
 function syncThemeCopy() {
-    if (isEmojiWebTheme()) {
+    if (isC64Theme()) {
+        subtitle.firstChild.nodeValue = "**** COMMODORE 64 BASIC V2 ****";
+        osReadout.textContent = "64K RAM SYSTEM 38911 BASIC BYTES FREE";
+        splashReadout.textContent = "READY.";
+        setMarqueeHtml("COMMODORE 64 MODE :: <b id=\"visitorCount\">----</b> BLOCKS FREE :: TODAY <b id=\"visitorToday\">--</b> :: <b id=\"counterMode\">READY</b> :: LOAD \"SQUINKY\",8,1 :: RUN");
+        trackTitle.textContent = "SID chip loop";
+        trackDetails.textContent = "3 voices / pulse wave / noise drum";
+        musicWindowTitle.textContent = "SID_PLAYER.PRG";
+        musicHeading.textContent = "SID Player";
+        startupLogo.textContent = "COMMODORE 64";
+        startupSubtitle.textContent = "BASIC V2 / SQUINKY DISK";
+        pressStartText.textContent = "RUN";
+        terminatedTitle.textContent = "READY.";
+        terminatedText.innerHTML = "PROGRAM ENDED<br>TYPE RUN TO START AGAIN.";
+        screensaverLogo.textContent = "READY.";
+        saverSignalOne.textContent = "LOAD";
+        saverSignalTwo.textContent = "\"SQUINKY\"";
+        saverSignalThree.textContent = "RUN";
+        screensaverText.innerHTML = "c64 screen blanker<br>move / tap / press any key";
+        document.getElementById("musicButton").innerText = isPlaying ? "STOP SID" : "RUN SID";
+        document.getElementById("warpButton").innerText = "POKE WARP";
+        document.getElementById("colorButton").innerText = "SYS 49152";
+        document.getElementById("resetButton").innerText = "LOAD AGAIN";
+        document.getElementById("terminateButton").innerText = "BREAK";
+    } else if (isEmojiWebTheme()) {
         subtitle.firstChild.nodeValue = "Welcome to Squinky World, a handmade web planet on squinky.dev.";
         osReadout.textContent = "WELCOME TO SQUINKY WORLD";
         splashReadout.textContent = "WEB PAGE: SPACE SONG LOADED";
@@ -1080,8 +1154,9 @@ function setTheme(index, announce) {
     recordVisitorCount();
     if (announce) {
         playAssetSound("blip", 0.18);
-        showThemeFlash(isEmojiWebTheme() ? "ENTERING SQUINKY WORLD" : "COLOR SHIFT: " + theme.name);
-        addLine(isEmojiWebTheme() ? "WEB PAGE OPENED: SQUINKY WORLD." : "COLOR SHIFT: " + theme.name + ".");
+        if (isC64Theme()) showC64LoadOverlay();
+        showThemeFlash(isC64Theme() ? "LOAD \"SQUINKY\",8,1" : (isEmojiWebTheme() ? "ENTERING SQUINKY WORLD" : "COLOR SHIFT: " + theme.name));
+        addLine(isC64Theme() ? "LOAD \"SQUINKY\",8,1" : (isEmojiWebTheme() ? "WEB PAGE OPENED: SQUINKY WORLD." : "COLOR SHIFT: " + theme.name + "."));
     }
     document.body.style.filter = "saturate(1.45) brightness(1.08)";
     setTimeout(function() { document.body.style.filter = ""; }, 250);
@@ -1113,7 +1188,7 @@ function resetOS() {
     borderBoost = 32;
     bootTimestamp = Date.now();
     updateDynamicReadouts();
-    document.getElementById("musicButton").innerText = isEmojiWebTheme() ? "PLAY SPACE SONG" : "START MUSIC";
+    document.getElementById("musicButton").innerText = isC64Theme() ? "RUN SID" : (isEmojiWebTheme() ? "PLAY SPACE SONG" : "START MUSIC");
     document.getElementById("musicButton2").innerText = "PLAY / MUTE";
     syncThemeCopy();
     terminalOutput.innerHTML = "";
@@ -1142,22 +1217,23 @@ function startRealityWarp() {
     clearTimeout(warpTimer);
     if (ensureAudio()) playWarpSound();
     document.body.classList.add("warping");
-    borderBoost = 62;
-    addLine("SQUINK WARP STARTED.");
-    addLine("TIME-WARP AUDIO ACTIVE.");
-    addLine("DISPLAY SHIFT ACTIVE.");
+    document.body.classList.toggle("c64-warping", isC64Theme());
+    borderBoost = isC64Theme() ? 88 : 62;
+    addLine(isC64Theme() ? "POKE 53281,0" : "SQUINK WARP STARTED.");
+    addLine(isC64Theme() ? "SYS 49152" : "TIME-WARP AUDIO ACTIVE.");
+    addLine(isC64Theme() ? "RUNNING COLOR RAM WARP." : "DISPLAY SHIFT ACTIVE.");
     for (let i = 0; i < 8; i++) setTimeout(makeSquinkNote, i * 150);
     warpTimer = setTimeout(function() {
-        document.body.classList.remove("warping");
+        document.body.classList.remove("warping", "c64-warping");
         borderBoost = 32;
-        addLine("SQUINK WARP COMPLETE.");
+        addLine(isC64Theme() ? "READY." : "SQUINK WARP COMPLETE.");
     }, 4200);
 }
 
 function makeSquinkNote() {
     const note = document.createElement("div");
     note.className = "squink-note";
-    const texts = ["signal", "file", "green", "saved", "sync", "shift", "loop", "time"];
+    const texts = isC64Theme() ? ["POKE", "RUN", "LOAD", "SYS", "READY", "DATA", "GOTO", "64K"] : ["signal", "file", "green", "saved", "sync", "shift", "loop", "time"];
     note.textContent = texts[Math.floor(Math.random() * texts.length)];
     const rect = desktop.getBoundingClientRect();
     note.style.left = Math.floor(Math.random() * Math.max(100, rect.width - 120) + 25) + "px";
@@ -1177,16 +1253,16 @@ function toggleMusic() {
         startMusic();
         isPlaying = true;
         document.body.classList.add("music-playing");
-        document.getElementById("musicButton").innerText = isEmojiWebTheme() ? "STOP SPACE SONG" : "MUTE MUSIC";
+        document.getElementById("musicButton").innerText = isC64Theme() ? "STOP SID" : (isEmojiWebTheme() ? "STOP SPACE SONG" : "MUTE MUSIC");
         document.getElementById("musicButton2").innerText = "PLAYING";
-        addLine(isEmojiWebTheme() ? "SPACE SONG PLAYING ON SQUINKY WORLD." : "MUSIC SYSTEM ONLINE.");
+        addLine(isC64Theme() ? "RUN SID_PLAYER.PRG" : (isEmojiWebTheme() ? "SPACE SONG PLAYING ON SQUINKY WORLD." : "MUSIC SYSTEM ONLINE."));
     } else {
         stopMusic();
         isPlaying = false;
         document.body.classList.remove("music-playing");
-        document.getElementById("musicButton").innerText = isEmojiWebTheme() ? "PLAY SPACE SONG" : "START MUSIC";
+        document.getElementById("musicButton").innerText = isC64Theme() ? "RUN SID" : (isEmojiWebTheme() ? "PLAY SPACE SONG" : "START MUSIC");
         document.getElementById("musicButton2").innerText = "PLAY / MUTE";
-        addLine(isEmojiWebTheme() ? "SPACE SONG STOPPED." : "MUSIC SYSTEM MUTED.");
+        addLine(isC64Theme() ? "BREAK IN SID_PLAYER.PRG" : (isEmojiWebTheme() ? "SPACE SONG STOPPED." : "MUSIC SYSTEM MUTED."));
     }
 }
 
@@ -1330,7 +1406,7 @@ function bounceLogoLetter(index, className) {
 function playLogoKey(index) {
     if (!ensureAudio()) return;
 
-    const activeNotes = isEmojiWebTheme() ? webNotes : notes;
+    const activeNotes = isC64Theme() ? c64Notes : (isEmojiWebTheme() ? webNotes : notes);
     const note = activeNotes[index % activeNotes.length];
     playNote(note, 0.16);
     bounceLogoLetter(index, "bounce-wide");
@@ -1420,8 +1496,8 @@ function playWarpSound() {
 function startMusic() {
     if (musicTimer) return;
     musicTimer = setInterval(function() {
-        const activeNotes = isEmojiWebTheme() ? webNotes : notes;
-        const activeDuration = isEmojiWebTheme() ? 0.11 : 0.14;
+        const activeNotes = isC64Theme() ? c64Notes : (isEmojiWebTheme() ? webNotes : notes);
+        const activeDuration = isC64Theme() ? 0.09 : (isEmojiWebTheme() ? 0.11 : 0.14);
         playNote(activeNotes[step % activeNotes.length], activeDuration);
         if (isEmojiWebTheme() && step % 4 === 0) {
             playNote(activeNotes[(step + 4) % activeNotes.length] * 2, 0.08);
