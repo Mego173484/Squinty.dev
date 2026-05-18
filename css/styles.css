@@ -303,6 +303,63 @@ body.theme-emoji-web .startup-button {
     box-shadow: 2px 2px 0 #000000;
 }
 
+body.theme-system-one .startup-screen,
+body.theme-system-one .terminated-screen {
+    background:
+        repeating-linear-gradient(45deg, #ffffff 0 2px, #d8d8d8 2px 4px),
+        #d8d8d8;
+    color: #000000;
+}
+
+body.theme-system-one .startup-screen::before,
+body.theme-system-one .startup-screen::after {
+    display: none;
+}
+
+body.theme-system-one .startup-box,
+body.theme-system-one .terminated-box {
+    border: 2px solid #000000;
+    background: #ffffff;
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.24);
+    color: #000000;
+}
+
+body.theme-system-one .startup-logo,
+body.theme-system-one .terminated-title {
+    color: #000000;
+    font-size: clamp(30px, 7vw, 64px);
+    text-shadow: none;
+}
+
+body.theme-system-one .startup-subtitle,
+body.theme-system-one .terminated-text,
+body.theme-system-one .press-start,
+body.theme-system-one .boot-lines {
+    color: #000000;
+    text-shadow: none;
+}
+
+body.theme-system-one .boot-lines {
+    border: 1px solid #000000;
+    background: #ffffff;
+}
+
+body.theme-system-one .startup-loading {
+    border: 1px solid #000000;
+    background: #ffffff;
+}
+
+body.theme-system-one .startup-loading-fill {
+    background: repeating-linear-gradient(90deg, #000000 0 8px, #ffffff 8px 12px);
+}
+
+body.theme-system-one .startup-button {
+    background: #ffffff;
+    border: 2px solid #000000;
+    color: #000000;
+    box-shadow: none;
+}
+
 body.theme-c64 .startup-screen,
 body.theme-c64 .terminated-screen {
     background:
@@ -357,6 +414,61 @@ body.theme-c64 .startup-button {
     border: 3px solid #fff35a;
     color: #151078;
     box-shadow: 4px 4px 0 #151078;
+}
+
+body.theme-msdos .startup-screen,
+body.theme-msdos .terminated-screen {
+    background: #000000;
+    color: #c0c0c0;
+}
+
+body.theme-msdos .startup-screen::before,
+body.theme-msdos .startup-screen::after {
+    display: none;
+}
+
+body.theme-msdos .startup-box,
+body.theme-msdos .terminated-box {
+    border: 2px solid #c0c0c0;
+    background: #000000;
+    box-shadow: none;
+    text-align: left;
+}
+
+body.theme-msdos .startup-logo,
+body.theme-msdos .terminated-title {
+    color: #ffffff;
+    font-size: clamp(30px, 8vw, 60px);
+    text-shadow: none;
+}
+
+body.theme-msdos .startup-subtitle,
+body.theme-msdos .terminated-text,
+body.theme-msdos .press-start,
+body.theme-msdos .boot-lines {
+    color: #c0c0c0;
+    text-shadow: none;
+}
+
+body.theme-msdos .boot-lines {
+    border: 0;
+    background: transparent;
+    font-size: 15px;
+}
+
+body.theme-msdos .startup-loading {
+    border: 1px solid #c0c0c0;
+}
+
+body.theme-msdos .startup-loading-fill {
+    background: repeating-linear-gradient(90deg, #c0c0c0 0 12px, #000000 12px 16px);
+}
+
+body.theme-msdos .startup-button {
+    background: #c0c0c0;
+    border: 2px outset #ffffff;
+    color: #000000;
+    box-shadow: none;
 }
 
 .wallpaper {
@@ -623,6 +735,59 @@ body.theme-c64 .turntable {
     box-shadow: 6px 6px 0 #000040;
 }
 
+body.theme-system-one .turntable {
+    width: 180px;
+    height: 150px;
+    border: 2px solid #000000;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+body.theme-system-one .turntable::before {
+    content: "Sound";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    padding: 5px;
+    border-bottom: 2px solid #000000;
+    background: repeating-linear-gradient(to bottom, #ffffff 0 2px, #000000 2px 3px, #ffffff 3px 5px);
+    color: #000000;
+    text-align: center;
+    text-shadow:
+        -2px 0 #ffffff,
+        2px 0 #ffffff,
+        0 -2px #ffffff,
+        0 2px #ffffff;
+}
+
+body.theme-system-one .vinyl-record {
+    left: 52px;
+    top: 58px;
+    width: 76px;
+    height: 58px;
+    border-radius: 0;
+    border: 2px solid #000000;
+    background:
+        linear-gradient(90deg, #000000 0 12px, #ffffff 12px 18px, #000000 18px 24px, #ffffff 24px 100%);
+    box-shadow: none;
+}
+
+body.theme-system-one .vinyl-record::before,
+body.theme-system-one .vinyl-record::after,
+body.theme-system-one .needle {
+    display: none;
+}
+
+body.theme-system-one.music-playing .vinyl-record {
+    animation: macSoundPulse 0.42s steps(2, end) infinite;
+}
+
+@keyframes macSoundPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+}
+
 body.theme-c64 .turntable::before {
     content: "6581 SID";
     position: absolute;
@@ -698,6 +863,7 @@ body.theme-msdos .page-shell {
 body.theme-msdos .top-area {
     border: 1px solid #c0c0c0;
     background: #000000;
+    text-align: left;
 }
 
 body.theme-msdos h1,
@@ -713,6 +879,72 @@ body.theme-msdos .video-card,
 body.theme-msdos .gallery-card,
 body.theme-msdos .guestbook-panel {
     border: 2px solid #c0c0c0;
+}
+
+body.theme-msdos::before {
+    opacity: 0.12;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(255,255,255,0.08) 1px, rgba(0,0,0,0.18) 1px, rgba(0,0,0,0.18) 4px);
+}
+
+body.theme-msdos::after {
+    background: radial-gradient(ellipse at center, transparent 0 64%, rgba(0,0,0,0.7) 100%);
+}
+
+body.theme-msdos #logo::before {
+    content: "C:\\SQUINKY>";
+    display: block;
+    color: #ffffff;
+    font-size: 0.45em;
+    text-shadow: none;
+}
+
+body.theme-msdos .theme-extra,
+body.theme-msdos .web-homepage-copy,
+body.theme-msdos .icon-row,
+body.theme-msdos .window:not(#terminalWindow),
+body.theme-msdos .taskbar .task-button:not([data-window="terminalWindow"]) {
+    display: none;
+}
+
+body.theme-msdos .window-grid {
+    display: block;
+}
+
+body.theme-msdos #terminalWindow {
+    display: block;
+    width: 100%;
+    min-height: 560px;
+}
+
+body.theme-msdos #terminalWindow .window-content {
+    min-height: 500px;
+}
+
+body.theme-msdos .terminal-screen {
+    min-height: 300px;
+    max-height: none;
+    font-size: 15px;
+}
+
+body.theme-msdos .terminal-line::before {
+    content: "C:\\SQUINKY>";
+}
+
+body.theme-msdos .terminal-line:first-child::before,
+body.theme-msdos .terminal-line:nth-child(2)::before,
+body.theme-msdos .terminal-line:nth-child(3)::before,
+body.theme-msdos .terminal-line:nth-child(4)::before {
+    content: "";
+}
+
+body.theme-msdos .quick-command::before,
+body.theme-msdos .task-button::before,
+body.theme-msdos .os-button::before {
+    content: "";
+}
+
+body.theme-msdos .quick-command {
+    text-transform: uppercase;
 }
 
 body.theme-system-one {
@@ -731,6 +963,9 @@ body.theme-system-one .marquee {
     color: #000000;
     border: 1px solid #000000;
     text-shadow: none;
+    padding: 4px 8px;
+    font-weight: normal;
+    box-shadow: inset 0 -1px 0 #000000;
 }
 
 body.theme-system-one .desktop,
@@ -739,7 +974,7 @@ body.theme-system-one .page-shell {
         repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0 1px, transparent 1px 4px),
         #d8d8d8;
     border: 2px solid #000000;
-    box-shadow: none;
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.18);
     color: #111111;
     animation: none;
 }
@@ -747,6 +982,18 @@ body.theme-system-one .page-shell {
 body.theme-system-one .top-area {
     border: 1px solid #000000;
     background: #ffffff;
+}
+
+body.theme-system-one .top-area::before {
+    content: "  File   Edit   View   Special";
+    display: block;
+    margin: -8px -8px 12px -8px;
+    padding: 4px 8px;
+    background: #ffffff;
+    border-bottom: 2px solid #000000;
+    color: #000000;
+    text-align: left;
+    font-weight: bold;
 }
 
 body.theme-system-one h1,
@@ -765,11 +1012,31 @@ body.theme-system-one .guestbook-panel {
     border: 2px solid #000000;
     box-shadow: none;
     color: #111111;
+    overflow: auto;
 }
 
 body.theme-system-one .small-text,
 body.theme-system-one .footer {
     color: #333333;
+}
+
+body.theme-system-one .theme-extra,
+body.theme-system-one .web-homepage-copy {
+    display: none;
+}
+
+body.theme-system-one .window::after,
+body.theme-system-one .page-shell::after {
+    content: "";
+    position: absolute;
+    right: 2px;
+    top: 28px;
+    bottom: 2px;
+    width: 12px;
+    border-left: 1px solid #000000;
+    background:
+        linear-gradient(#ffffff 0 12px, #000000 12px 13px, #ffffff 13px calc(100% - 13px), #000000 calc(100% - 13px) calc(100% - 12px), #ffffff calc(100% - 12px));
+    pointer-events: none;
 }
 
 body.theme-c64 .wallpaper {
@@ -1559,6 +1826,23 @@ body.theme-system-one .icon-art.folder {
         linear-gradient(to bottom, #ffffff 0 20%, #000000 20% 28%, #ffffff 28% 100%);
 }
 
+body.theme-system-one .icon-art.record-icon {
+    border-radius: 0;
+    background:
+        linear-gradient(to bottom, #ffffff 0 24%, #000000 24% 30%, #ffffff 30% 100%);
+}
+
+body.theme-system-one .icon-label {
+    padding: 2px 3px;
+    color: #000000;
+    text-shadow: none;
+}
+
+body.theme-system-one .desktop-icon:hover .icon-label {
+    background: #000000;
+    color: #ffffff;
+}
+
 body.theme-system-one .desktop-icon:hover,
 body.theme-system-one .window:hover,
 body.theme-msdos .desktop-icon:hover,
@@ -2307,6 +2591,70 @@ body.theme-emoji-web.music-beat .web-song-box {
     animation-duration: 2.1s;
 }
 
+.driver-loader.dos-load {
+    z-index: 12000;
+    background: #000000;
+    color: #c0c0c0;
+}
+
+.driver-loader.dos-load .driver-box {
+    border: 2px solid #c0c0c0;
+    background: #000000;
+    box-shadow: none;
+    text-align: left;
+}
+
+.driver-loader.dos-load .driver-title,
+.driver-loader.dos-load .driver-line {
+    color: #c0c0c0;
+    text-shadow: none;
+    font-family: "Courier New", monospace;
+    font-size: 16px;
+}
+
+.driver-loader.dos-load .driver-progress {
+    height: 16px;
+    border: 1px solid #c0c0c0;
+    background: #000000;
+}
+
+.driver-loader.dos-load .driver-progress span {
+    background: repeating-linear-gradient(90deg, #c0c0c0 0 12px, #000000 12px 16px);
+    animation-duration: 1.8s;
+}
+
+.driver-loader.mac-load {
+    z-index: 12000;
+    background:
+        repeating-linear-gradient(45deg, #ffffff 0 2px, #d8d8d8 2px 4px),
+        #d8d8d8;
+    color: #000000;
+}
+
+.driver-loader.mac-load .driver-box {
+    border: 2px solid #000000;
+    background: #ffffff;
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.24);
+    color: #000000;
+}
+
+.driver-loader.mac-load .driver-title,
+.driver-loader.mac-load .driver-line {
+    color: #000000;
+    text-shadow: none;
+    font-family: Chicago, Geneva, "Helvetica Neue", Arial, sans-serif;
+}
+
+.driver-loader.mac-load .driver-progress {
+    border: 1px solid #000000;
+    background: #ffffff;
+}
+
+.driver-loader.mac-load .driver-progress span {
+    background: repeating-linear-gradient(90deg, #000000 0 8px, #ffffff 8px 12px);
+    animation-duration: 1.6s;
+}
+
 .driver-title {
     color: var(--green);
     font-size: clamp(26px, 7vw, 54px);
@@ -2723,6 +3071,88 @@ body.theme-c64 .saver-signal {
     text-transform: uppercase;
 }
 
+body.theme-msdos .screensaver {
+    background: #000000;
+}
+
+body.theme-msdos .screensaver::before,
+body.theme-msdos .screensaver::after {
+    display: none;
+}
+
+body.theme-msdos .screensaver-core {
+    display: none;
+}
+
+body.theme-msdos .screensaver-logo {
+    color: #c0c0c0;
+    font: bold clamp(28px, 8vw, 82px) "Courier New", monospace;
+    text-shadow: none;
+    animation: dosSaverBounce 5.5s steps(12, end) infinite alternate;
+}
+
+body.theme-msdos .screensaver-text,
+body.theme-msdos .saver-signal {
+    color: #c0c0c0;
+    text-shadow: none;
+}
+
+body.theme-system-one .screensaver {
+    background:
+        repeating-linear-gradient(45deg, #ffffff 0 2px, #d8d8d8 2px 4px),
+        #d8d8d8;
+}
+
+body.theme-system-one .screensaver::before,
+body.theme-system-one .screensaver::after {
+    display: none;
+}
+
+body.theme-system-one .screensaver-core {
+    width: min(48vw, 360px);
+    border-radius: 0;
+    border: 2px solid #000000;
+    background: #ffffff;
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.25);
+    animation: macSaverWindow 5s steps(10, end) infinite alternate;
+}
+
+body.theme-system-one .screensaver-core::before {
+    inset: 0;
+    border: 0;
+    border-radius: 0;
+    background:
+        repeating-linear-gradient(to bottom, #ffffff 0 2px, #000000 2px 3px, #ffffff 3px 5px);
+    height: 24px;
+    box-shadow: none;
+}
+
+body.theme-system-one .screensaver-core::after {
+    display: none;
+}
+
+body.theme-system-one .screensaver-logo {
+    color: #000000;
+    font-size: clamp(34px, 8vw, 82px);
+    text-shadow: none;
+}
+
+body.theme-system-one .screensaver-text,
+body.theme-system-one .saver-signal {
+    color: #000000;
+    text-shadow: none;
+}
+
+@keyframes macSaverWindow {
+    from { transform: translate(-18vw, -16vh); }
+    to { transform: translate(18vw, 16vh); }
+}
+
+@keyframes dosSaverBounce {
+    from { transform: translate(-22vw, -24vh); }
+    to { transform: translate(22vw, 22vh); }
+}
+
 .saver-signal {
     position: absolute;
     z-index: 2;
@@ -2803,6 +3233,51 @@ body.theme-c64.c64-warping .taskbar {
 
 body.theme-c64.c64-warping::before {
     opacity: 0.76;
+}
+
+body.theme-msdos.dos-warping .desktop,
+body.theme-msdos.dos-warping #terminalWindow {
+    animation: dosWarp 0.16s steps(2, end) infinite;
+    filter: contrast(1.4);
+}
+
+body.theme-msdos.dos-warping .terminal-screen {
+    background:
+        repeating-linear-gradient(to bottom, #000000 0 14px, #0000aa 14px 28px),
+        #000000;
+}
+
+body.theme-system-one.mac-warping .desktop::after {
+    content: "☹ System Error\A Finder encountered a warp.\A [ Restart ]";
+    white-space: pre;
+    position: fixed;
+    z-index: 11000;
+    left: 50%;
+    top: 50%;
+    width: min(420px, 82vw);
+    padding: 28px;
+    transform: translate(-50%, -50%);
+    border: 3px solid #000000;
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.24);
+    font: bold 18px Chicago, Geneva, "Helvetica Neue", Arial, sans-serif;
+    text-align: center;
+}
+
+body.theme-system-one.mac-warping .window,
+body.theme-system-one.mac-warping .desktop-icon {
+    animation: macJitter 0.18s steps(2, end) infinite;
+}
+
+@keyframes macJitter {
+    from { transform: translate(-1px, 0); }
+    to { transform: translate(1px, 1px); }
+}
+
+@keyframes dosWarp {
+    from { transform: translateX(-3px); }
+    to { transform: translateX(3px); }
 }
 
 @keyframes c64Warp {

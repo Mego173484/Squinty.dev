@@ -53,6 +53,26 @@ const c64BootLinePool = [
     "RUN"
 ];
 
+const dosBootLinePool = [
+    "Starting MS-DOS...",
+    "HIMEM is testing extended memory...done.",
+    "C:\\>SET PATH=C:\\SQUINKY;C:\\DOS",
+    "C:\\>CD SQUINKY",
+    "C:\\SQUINKY>DIR",
+    "COMMAND.COM READY",
+    "Type HELP for a list of commands."
+];
+
+const macBootLinePool = [
+    "Welcome to Macintosh.",
+    "System Folder found.",
+    "Finder loading...",
+    "Opening squinky.dev disk.",
+    "6 items on desktop.",
+    "Sound control panel ready.",
+    "Menu bar ready."
+];
+
 const splashTexts = [
     "signal found",
     "running on old hardware",
@@ -95,6 +115,22 @@ const c64Events = [
     "C64 EVENT: SID VOICE 2 WARM.",
     "C64 EVENT: POKE 53280,6.",
     "C64 EVENT: DATA LINES COLOR CYCLING."
+];
+
+const dosEvents = [
+    "DOS EVENT: C:\\SQUINKY>DIR /W",
+    "DOS EVENT: AUTOEXEC.BAT CHECKED.",
+    "DOS EVENT: PC SPEAKER READY.",
+    "DOS EVENT: PATH=C:\\SQUINKY;C:\\DOS",
+    "DOS EVENT: CHKDSK FOUND 0 BAD SECTORS."
+];
+
+const macEvents = [
+    "MAC EVENT: Finder updated desktop.",
+    "MAC EVENT: Sound control panel idle.",
+    "MAC EVENT: System Folder checked.",
+    "MAC EVENT: Clipboard file ready.",
+    "MAC EVENT: Disk window refreshed."
 ];
 
 const blockedWords = [
@@ -226,6 +262,8 @@ const logoLetters = document.querySelectorAll(".logo-letter");
 const notes = [392, 523, 659, 523, 440, 587, 740, 587, 349, 440, 523, 440, 330, 392, 494, 392];
 const webNotes = [523, 659, 784, 988, 880, 784, 659, 587, 659, 784, 1047, 988, 784, 659, 587, 523];
 const c64Notes = [196, 262, 196, 330, 262, 392, 330, 262, 220, 294, 220, 349, 294, 440, 349, 294];
+const dosNotes = [131, 147, 165, 147, 131, 196, 165, 147, 110, 131, 147, 131, 98, 110, 131, 98];
+const macNotes = [523, 659, 784, 659, 587, 698, 880, 698, 494, 587, 659, 587, 440, 523, 659, 523];
 
 themes.forEach(function(theme, index) {
     const button = document.createElement("button");
@@ -359,8 +397,8 @@ function enterSite() {
     startupScreen.classList.add("hidden");
     startupScreen.classList.remove("visible");
     startWaveBorder();
-    addLine(isC64Theme() ? "READY." : (isEmojiWebTheme() ? "SQUINKY WORLD PAGE LOADED." : "SQUINKYDOS FANFARE COMPLETE."));
-    addLine(isC64Theme() ? "RUN" : (isEmojiWebTheme() ? "WELCOME, WEB TRAVELER." : "SYSTEM ONLINE."));
+    addLine(isSystemOneTheme() ? "Welcome to Macintosh." : (isDosTheme() ? "C:\\SQUINKY>SQUINKY.EXE" : (isC64Theme() ? "READY." : (isEmojiWebTheme() ? "SQUINKY WORLD PAGE LOADED." : "SQUINKYDOS FANFARE COMPLETE."))));
+    addLine(isSystemOneTheme() ? "Finder opened squinky.dev." : (isDosTheme() ? "COMMAND.COM READY. TYPE HELP." : (isC64Theme() ? "RUN" : (isEmojiWebTheme() ? "WELCOME, WEB TRAVELER." : "SYSTEM ONLINE."))));
     scheduleSystemEvent();
 }
 
@@ -449,6 +487,20 @@ function updateDynamicReadouts() {
         return;
     }
 
+    if (isSystemOneTheme()) {
+        clockReadout.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        uptimeReadout.textContent = "Memory " + String(512 - (uptimeSeconds % 96)) + "K";
+        signalReadout.textContent = "Disk OK";
+        return;
+    }
+
+    if (isDosTheme()) {
+        clockReadout.textContent = "TIME " + now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        uptimeReadout.textContent = "MEM " + String(640 - (uptimeSeconds % 64)).padStart(3, "0") + "K";
+        signalReadout.textContent = "ERR 0";
+        return;
+    }
+
     if (isEmojiWebTheme()) {
         clockReadout.textContent = "LOCAL TIME " + now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         uptimeReadout.textContent = "WEB TOUR " + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
@@ -465,7 +517,7 @@ function scheduleSystemEvent() {
     clearTimeout(systemEventTimer);
     systemEventTimer = setTimeout(function() {
         if (!isTerminated && startupScreen.classList.contains("hidden") && !screensaverActive) {
-            const events = isC64Theme() ? c64Events : (isEmojiWebTheme() ? webEvents : systemEvents);
+            const events = isSystemOneTheme() ? macEvents : (isDosTheme() ? dosEvents : (isC64Theme() ? c64Events : (isEmojiWebTheme() ? webEvents : systemEvents)));
             addLine(events[Math.floor(Math.random() * events.length)]);
         }
 
@@ -490,8 +542,8 @@ function makeClickSpark(event) {
 // Startup, splash, and local visit counter
 function renderBootLines() {
     const count = randomInt(4, 6);
-    const pool = isC64Theme() ? c64BootLinePool : (isEmojiWebTheme() ? webBootLinePool : bootLinePool);
-    const chosenLines = isC64Theme() ? pool : shuffleArray(pool).slice(0, count);
+    const pool = isSystemOneTheme() ? macBootLinePool : (isDosTheme() ? dosBootLinePool : (isC64Theme() ? c64BootLinePool : (isEmojiWebTheme() ? webBootLinePool : bootLinePool)));
+    const chosenLines = (isC64Theme() || isDosTheme() || isSystemOneTheme()) ? pool : shuffleArray(pool).slice(0, count);
     bootLines.innerHTML = chosenLines.join("<br>");
 }
 
@@ -505,7 +557,7 @@ function rerollSplash(announce) {
     }
 
     currentSplash = nextSplash;
-    splashReadout.textContent = isC64Theme() ? "READY." : (isEmojiWebTheme() ? "WEB PAGE: SPACE SONG LOADED" : "SPLASH: " + currentSplash);
+    splashReadout.textContent = isSystemOneTheme() ? "Finder: squinky.dev" : (isDosTheme() ? "C:\\SQUINKY>_" : (isC64Theme() ? "READY." : (isEmojiWebTheme() ? "WEB PAGE: SPACE SONG LOADED" : "SPLASH: " + currentSplash)));
 
     if (announce) {
         addLine("SPLASH TEXT: " + currentSplash.toUpperCase() + ".");
@@ -1031,11 +1083,55 @@ function isC64Theme() {
     return themes[themeIndex] && themes[themeIndex].className === "theme-c64";
 }
 
+function isDosTheme() {
+    return themes[themeIndex] && themes[themeIndex].className === "theme-msdos";
+}
+
+function isSystemOneTheme() {
+    return themes[themeIndex] && themes[themeIndex].className === "theme-system-one";
+}
+
 function setMarqueeHtml(html) {
     marqueeText.innerHTML = html;
     visitorCount = document.getElementById("visitorCount");
     visitorToday = document.getElementById("visitorToday");
     counterMode = document.getElementById("counterMode");
+}
+
+function showMacLoadOverlay() {
+    driverTitle.textContent = "Welcome to Macintosh";
+    driverLine.textContent = "Opening squinky.dev disk...";
+    driverLoader.classList.add("visible", "mac-load");
+
+    setTimeout(function() {
+        driverLine.textContent = "Loading Finder and Sound control panel...";
+    }, 520);
+
+    setTimeout(function() {
+        driverLine.textContent = "Desktop ready.";
+    }, 1250);
+
+    setTimeout(function() {
+        driverLoader.classList.remove("visible", "mac-load");
+    }, 1850);
+}
+
+function showDosLoadOverlay() {
+    driverTitle.textContent = "C:\\SQUINKY> SQUINKY.EXE";
+    driverLine.textContent = "Loading COMMAND.COM...";
+    driverLoader.classList.add("visible", "dos-load");
+
+    setTimeout(function() {
+        driverLine.textContent = "Checking AUTOEXEC.BAT and CONFIG.SYS...";
+    }, 520);
+
+    setTimeout(function() {
+        driverLine.textContent = "C:\\SQUINKY>READY";
+    }, 1250);
+
+    setTimeout(function() {
+        driverLoader.classList.remove("visible", "dos-load");
+    }, 1900);
 }
 
 function showC64LoadOverlay() {
@@ -1057,7 +1153,55 @@ function showC64LoadOverlay() {
 }
 
 function syncThemeCopy() {
-    if (isC64Theme()) {
+    if (isSystemOneTheme()) {
+        subtitle.firstChild.nodeValue = "Finder desktop for the squinky.dev disk.";
+        osReadout.textContent = "System 1.0 Disk";
+        splashReadout.textContent = "Finder: squinky.dev";
+        setMarqueeHtml("  File  Edit  View  Special  :: REAL VISITS <b id=\"visitorCount\">----</b> :: TODAY <b id=\"visitorToday\">--</b> :: <b id=\"counterMode\">Finder</b>");
+        trackTitle.textContent = "Simple Sound";
+        trackDetails.textContent = "one-bit style bell / control panel";
+        musicWindowTitle.textContent = "Sound";
+        musicHeading.textContent = "Sound";
+        startupLogo.textContent = "Welcome to Macintosh";
+        startupSubtitle.textContent = "System 1.0";
+        pressStartText.textContent = "Click to open squinky.dev";
+        terminatedTitle.textContent = "You may now close this disk";
+        terminatedText.innerHTML = "Finder closed the squinky.dev window.<br>Restart to open the disk again.";
+        screensaverLogo.textContent = "squinky.dev";
+        saverSignalOne.textContent = "Finder";
+        saverSignalTwo.textContent = "System";
+        saverSignalThree.textContent = "Sound";
+        screensaverText.innerHTML = "screen saver active<br>move / click / press any key";
+        document.getElementById("musicButton").innerText = isPlaying ? "Stop Sound" : "Play Sound";
+        document.getElementById("warpButton").innerText = "Bomb";
+        document.getElementById("colorButton").innerText = "Special";
+        document.getElementById("resetButton").innerText = "Restart";
+        document.getElementById("terminateButton").innerText = "Shut Down";
+    } else if (isDosTheme()) {
+        subtitle.firstChild.nodeValue = "Microsoft(R) MS-DOS(R) Version 6.22";
+        osReadout.textContent = "C:\\SQUINKY>";
+        splashReadout.textContent = "C:\\SQUINKY>_";
+        setMarqueeHtml("MS-DOS MODE :: REAL VISITS <b id=\"visitorCount\">----</b> :: TODAY <b id=\"visitorToday\">--</b> :: <b id=\"counterMode\">COMMAND.COM</b> :: DIR :: HELP :: MUSIC :: GUESTBOOK");
+        trackTitle.textContent = "PC speaker loop";
+        trackDetails.textContent = "square beep / no sound card / COMMAND.COM";
+        musicWindowTitle.textContent = "SPEAKER.EXE";
+        musicHeading.textContent = "PC Speaker";
+        startupLogo.textContent = "MS-DOS";
+        startupSubtitle.textContent = "COMMAND.COM";
+        pressStartText.textContent = "TYPE WIN? NO. PRESS START.";
+        terminatedTitle.textContent = "It is now safe to turn off your computer";
+        terminatedText.innerHTML = "C:\\SQUINKY>EXIT<br>COMMAND INTERPRETER STOPPED.";
+        screensaverLogo.textContent = "C:\\SQUINKY>";
+        saverSignalOne.textContent = "DIR";
+        saverSignalTwo.textContent = "HELP";
+        saverSignalThree.textContent = "RUN";
+        screensaverText.innerHTML = "dos screen saver active<br>press any key to continue";
+        document.getElementById("musicButton").innerText = isPlaying ? "STOP SPEAKER" : "RUN SPEAKER";
+        document.getElementById("warpButton").innerText = "DEBUG WARP";
+        document.getElementById("colorButton").innerText = "MODE CON";
+        document.getElementById("resetButton").innerText = "REBOOT";
+        document.getElementById("terminateButton").innerText = "EXIT";
+    } else if (isC64Theme()) {
         subtitle.firstChild.nodeValue = "**** COMMODORE 64 BASIC V2 ****";
         osReadout.textContent = "64K RAM SYSTEM 38911 BASIC BYTES FREE";
         splashReadout.textContent = "READY.";
@@ -1154,9 +1298,11 @@ function setTheme(index, announce) {
     recordVisitorCount();
     if (announce) {
         playAssetSound("blip", 0.18);
+        if (isSystemOneTheme()) showMacLoadOverlay();
+        if (isDosTheme()) showDosLoadOverlay();
         if (isC64Theme()) showC64LoadOverlay();
-        showThemeFlash(isC64Theme() ? "LOAD \"SQUINKY\",8,1" : (isEmojiWebTheme() ? "ENTERING SQUINKY WORLD" : "COLOR SHIFT: " + theme.name));
-        addLine(isC64Theme() ? "LOAD \"SQUINKY\",8,1" : (isEmojiWebTheme() ? "WEB PAGE OPENED: SQUINKY WORLD." : "COLOR SHIFT: " + theme.name + "."));
+        showThemeFlash(isSystemOneTheme() ? "Welcome to Macintosh" : (isDosTheme() ? "C:\\SQUINKY>SQUINKY.EXE" : (isC64Theme() ? "LOAD \"SQUINKY\",8,1" : (isEmojiWebTheme() ? "ENTERING SQUINKY WORLD" : "COLOR SHIFT: " + theme.name))));
+        addLine(isSystemOneTheme() ? "Finder opened squinky.dev disk." : (isDosTheme() ? "C:\\SQUINKY>SQUINKY.EXE" : (isC64Theme() ? "LOAD \"SQUINKY\",8,1" : (isEmojiWebTheme() ? "WEB PAGE OPENED: SQUINKY WORLD." : "COLOR SHIFT: " + theme.name + "."))));
     }
     document.body.style.filter = "saturate(1.45) brightness(1.08)";
     setTimeout(function() { document.body.style.filter = ""; }, 250);
@@ -1188,12 +1334,12 @@ function resetOS() {
     borderBoost = 32;
     bootTimestamp = Date.now();
     updateDynamicReadouts();
-    document.getElementById("musicButton").innerText = isC64Theme() ? "RUN SID" : (isEmojiWebTheme() ? "PLAY SPACE SONG" : "START MUSIC");
+    document.getElementById("musicButton").innerText = isSystemOneTheme() ? "Play Sound" : (isDosTheme() ? "RUN SPEAKER" : (isC64Theme() ? "RUN SID" : (isEmojiWebTheme() ? "PLAY SPACE SONG" : "START MUSIC")));
     document.getElementById("musicButton2").innerText = "PLAY / MUTE";
     syncThemeCopy();
     terminalOutput.innerHTML = "";
-    addLine("RESETTING SQUINKYDOS...");
-    addLine("VERSION 173484 WAITING FOR START.");
+    addLine(isSystemOneTheme() ? "Restarting Finder..." : (isDosTheme() ? "REBOOTING MS-DOS..." : "RESETTING SQUINKYDOS..."));
+    addLine(isSystemOneTheme() ? "Welcome to Macintosh waiting." : (isDosTheme() ? "COMMAND.COM WAITING FOR START." : "VERSION 173484 WAITING FOR START."));
     resetScreensaverTimer();
 }
 
@@ -1217,23 +1363,25 @@ function startRealityWarp() {
     clearTimeout(warpTimer);
     if (ensureAudio()) playWarpSound();
     document.body.classList.add("warping");
+    document.body.classList.toggle("mac-warping", isSystemOneTheme());
+    document.body.classList.toggle("dos-warping", isDosTheme());
     document.body.classList.toggle("c64-warping", isC64Theme());
-    borderBoost = isC64Theme() ? 88 : 62;
-    addLine(isC64Theme() ? "POKE 53281,0" : "SQUINK WARP STARTED.");
-    addLine(isC64Theme() ? "SYS 49152" : "TIME-WARP AUDIO ACTIVE.");
-    addLine(isC64Theme() ? "RUNNING COLOR RAM WARP." : "DISPLAY SHIFT ACTIVE.");
+    borderBoost = isSystemOneTheme() ? 58 : (isDosTheme() ? 74 : (isC64Theme() ? 88 : 62));
+    addLine(isSystemOneTheme() ? "System Error: Finder warp." : (isDosTheme() ? "DEBUG C:\\SQUINKY\\WARP.COM" : (isC64Theme() ? "POKE 53281,0" : "SQUINK WARP STARTED.")));
+    addLine(isSystemOneTheme() ? "Bomb dialog displayed." : (isDosTheme() ? "-G=CS:0100" : (isC64Theme() ? "SYS 49152" : "TIME-WARP AUDIO ACTIVE.")));
+    addLine(isSystemOneTheme() ? "Click Restart to continue." : (isDosTheme() ? "DISPLAY MODE 03H SHIFT ACTIVE." : (isC64Theme() ? "RUNNING COLOR RAM WARP." : "DISPLAY SHIFT ACTIVE.")));
     for (let i = 0; i < 8; i++) setTimeout(makeSquinkNote, i * 150);
     warpTimer = setTimeout(function() {
-        document.body.classList.remove("warping", "c64-warping");
+        document.body.classList.remove("warping", "c64-warping", "dos-warping", "mac-warping");
         borderBoost = 32;
-        addLine(isC64Theme() ? "READY." : "SQUINK WARP COMPLETE.");
+        addLine(isSystemOneTheme() ? "Finder recovered." : (isDosTheme() ? "PROGRAM TERMINATED NORMALLY." : (isC64Theme() ? "READY." : "SQUINK WARP COMPLETE.")));
     }, 4200);
 }
 
 function makeSquinkNote() {
     const note = document.createElement("div");
     note.className = "squink-note";
-    const texts = isC64Theme() ? ["POKE", "RUN", "LOAD", "SYS", "READY", "DATA", "GOTO", "64K"] : ["signal", "file", "green", "saved", "sync", "shift", "loop", "time"];
+    const texts = isSystemOneTheme() ? ["Finder", "Sound", "Disk", "System", "Special", "Desk", "File", "Restart"] : (isDosTheme() ? ["DIR", "CD", "EXE", "BAT", "SYS", "MEM", "CHKDSK", "PROMPT"] : (isC64Theme() ? ["POKE", "RUN", "LOAD", "SYS", "READY", "DATA", "GOTO", "64K"] : ["signal", "file", "green", "saved", "sync", "shift", "loop", "time"]));
     note.textContent = texts[Math.floor(Math.random() * texts.length)];
     const rect = desktop.getBoundingClientRect();
     note.style.left = Math.floor(Math.random() * Math.max(100, rect.width - 120) + 25) + "px";
@@ -1253,16 +1401,16 @@ function toggleMusic() {
         startMusic();
         isPlaying = true;
         document.body.classList.add("music-playing");
-        document.getElementById("musicButton").innerText = isC64Theme() ? "STOP SID" : (isEmojiWebTheme() ? "STOP SPACE SONG" : "MUTE MUSIC");
+        document.getElementById("musicButton").innerText = isSystemOneTheme() ? "Stop Sound" : (isDosTheme() ? "STOP SPEAKER" : (isC64Theme() ? "STOP SID" : (isEmojiWebTheme() ? "STOP SPACE SONG" : "MUTE MUSIC")));
         document.getElementById("musicButton2").innerText = "PLAYING";
-        addLine(isC64Theme() ? "RUN SID_PLAYER.PRG" : (isEmojiWebTheme() ? "SPACE SONG PLAYING ON SQUINKY WORLD." : "MUSIC SYSTEM ONLINE."));
+        addLine(isSystemOneTheme() ? "Sound control panel playing." : (isDosTheme() ? "C:\\SQUINKY>SPEAKER.EXE" : (isC64Theme() ? "RUN SID_PLAYER.PRG" : (isEmojiWebTheme() ? "SPACE SONG PLAYING ON SQUINKY WORLD." : "MUSIC SYSTEM ONLINE."))));
     } else {
         stopMusic();
         isPlaying = false;
         document.body.classList.remove("music-playing");
-        document.getElementById("musicButton").innerText = isC64Theme() ? "RUN SID" : (isEmojiWebTheme() ? "PLAY SPACE SONG" : "START MUSIC");
+        document.getElementById("musicButton").innerText = isSystemOneTheme() ? "Play Sound" : (isDosTheme() ? "RUN SPEAKER" : (isC64Theme() ? "RUN SID" : (isEmojiWebTheme() ? "PLAY SPACE SONG" : "START MUSIC")));
         document.getElementById("musicButton2").innerText = "PLAY / MUTE";
-        addLine(isC64Theme() ? "BREAK IN SID_PLAYER.PRG" : (isEmojiWebTheme() ? "SPACE SONG STOPPED." : "MUSIC SYSTEM MUTED."));
+        addLine(isSystemOneTheme() ? "Sound stopped." : (isDosTheme() ? "SPEAKER.EXE TERMINATED." : (isC64Theme() ? "BREAK IN SID_PLAYER.PRG" : (isEmojiWebTheme() ? "SPACE SONG STOPPED." : "MUSIC SYSTEM MUTED."))));
     }
 }
 
@@ -1406,7 +1554,7 @@ function bounceLogoLetter(index, className) {
 function playLogoKey(index) {
     if (!ensureAudio()) return;
 
-    const activeNotes = isC64Theme() ? c64Notes : (isEmojiWebTheme() ? webNotes : notes);
+    const activeNotes = isSystemOneTheme() ? macNotes : (isDosTheme() ? dosNotes : (isC64Theme() ? c64Notes : (isEmojiWebTheme() ? webNotes : notes)));
     const note = activeNotes[index % activeNotes.length];
     playNote(note, 0.16);
     bounceLogoLetter(index, "bounce-wide");
@@ -1496,8 +1644,8 @@ function playWarpSound() {
 function startMusic() {
     if (musicTimer) return;
     musicTimer = setInterval(function() {
-        const activeNotes = isC64Theme() ? c64Notes : (isEmojiWebTheme() ? webNotes : notes);
-        const activeDuration = isC64Theme() ? 0.09 : (isEmojiWebTheme() ? 0.11 : 0.14);
+        const activeNotes = isSystemOneTheme() ? macNotes : (isDosTheme() ? dosNotes : (isC64Theme() ? c64Notes : (isEmojiWebTheme() ? webNotes : notes)));
+        const activeDuration = isSystemOneTheme() ? 0.1 : (isDosTheme() ? 0.07 : (isC64Theme() ? 0.09 : (isEmojiWebTheme() ? 0.11 : 0.14)));
         playNote(activeNotes[step % activeNotes.length], activeDuration);
         if (isEmojiWebTheme() && step % 4 === 0) {
             playNote(activeNotes[(step + 4) % activeNotes.length] * 2, 0.08);
