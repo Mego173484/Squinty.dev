@@ -560,8 +560,131 @@ body.theme-concord .desktop {
 
 body.theme-emoji-web .desktop {
     background:
-        repeating-linear-gradient(45deg, rgba(255,255,255,0.07) 0 8px, transparent 8px 18px),
-        linear-gradient(135deg, rgba(93, 0, 180, 0.95), rgba(0, 91, 180, 0.95), rgba(210, 0, 120, 0.9));
+        radial-gradient(circle at 12% 20%, rgba(255, 255, 0, 0.8) 0 7px, transparent 8px),
+        radial-gradient(circle at 82% 18%, rgba(255, 120, 0, 0.75) 0 8px, transparent 9px),
+        radial-gradient(circle at 72% 46%, rgba(120, 180, 255, 0.34) 0 42px, transparent 43px),
+        repeating-radial-gradient(circle at 24% 72%, rgba(255,255,255,0.9) 0 1px, transparent 1px 18px),
+        #000000;
+    border: 5px ridge #c0c0c0;
+    box-shadow: 0 0 0 4px #808080, 0 0 28px #ff4df3;
+}
+
+body.theme-emoji-web .wallpaper {
+    background:
+        radial-gradient(circle at 18% 35%, rgba(255,255,255,0.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 72% 22%, rgba(255,240,0,0.78) 0 11px, transparent 12px),
+        radial-gradient(circle at 82% 68%, rgba(108,160,255,0.42) 0 58px, transparent 59px),
+        radial-gradient(circle at 24% 72%, rgba(160,120,60,0.65) 0 48px, transparent 49px),
+        #000000;
+    background-size: 90px 90px, auto, auto, auto, auto;
+}
+
+body.theme-emoji-web .wallpaper::before {
+    background-image:
+        linear-gradient(90deg, #ff2600, #fff200, #39ff14, #2fffff, #ff4df3),
+        linear-gradient(rgba(255,255,255,0.24) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(255,255,255,0.22) 2px, transparent 2px);
+    background-size: 100% 8px, 92px 36px, 92px 36px;
+    background-repeat: repeat-x, repeat, repeat;
+}
+
+body.theme-emoji-web .top-area {
+    padding-top: 62px;
+    border: 4px ridge #c0c0c0;
+    background:
+        radial-gradient(circle at 8% 20%, #fff200 0 8px, transparent 9px),
+        radial-gradient(circle at 92% 22%, #ff7a00 0 8px, transparent 9px),
+        repeating-radial-gradient(circle at center, rgba(255,255,255,0.95) 0 1px, transparent 1px 20px),
+        #000000;
+}
+
+body.theme-emoji-web .top-area::before {
+    content: "Netscape Navigator  ::  squinky universe";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    padding: 5px 8px;
+    background: #c0c0c0;
+    border-bottom: 3px ridge #ffffff;
+    color: #000000;
+    font: bold 12px var(--terminal-font);
+    text-align: left;
+    text-shadow: none;
+    box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #808080;
+}
+
+body.theme-emoji-web .top-area::after {
+    content: "Back   Forward   Reload   Home   Search   Security   Stop";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 25px;
+    padding: 4px 8px;
+    background: #b7b7b7;
+    border-bottom: 3px ridge #ffffff;
+    color: #000000;
+    font: bold 11px var(--terminal-font);
+    text-align: left;
+    text-shadow: none;
+    pointer-events: none;
+}
+
+body.theme-emoji-web #logo::before {
+    content: "Welcome To...";
+    display: block;
+    color: #ffffff;
+    font-style: italic;
+    font-size: clamp(30px, 6vw, 58px);
+    line-height: 0.9;
+    text-shadow: 4px 4px 0 #808080, 0 0 12px #ffffff;
+}
+
+body.theme-emoji-web #logo::after {
+    content: "";
+    display: block;
+    height: 6px;
+    margin: 10px auto 4px auto;
+    width: min(520px, 82%);
+    background: linear-gradient(90deg, #ff2600, #fff200, #39ff14, #2fffff, #ff4df3);
+}
+
+body.theme-emoji-web .marquee {
+    background: #c0c0c0;
+    color: #000000;
+    border: 3px ridge #ffffff;
+    text-shadow: none;
+    box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #808080;
+}
+
+body.theme-emoji-web #logo {
+    color: #ff5cf4;
+    text-align: center;
+    text-shadow: 3px 3px 0 #7b0000, 0 0 12px #fff200, 0 0 22px #ff4df3;
+}
+
+body.theme-emoji-web .theme-extra {
+    display: block;
+    margin-top: 4px;
+    color: #fff200;
+    font-size: 0.5em;
+    text-shadow: 2px 2px 0 #000000, 0 0 12px #39ff14;
+}
+
+body.theme-emoji-web .subtitle {
+    color: #fff200;
+    font: bold 16px Georgia, "Times New Roman", serif;
+    text-shadow: 1px 1px 0 #000000, 0 0 8px #39ff14;
+}
+
+body.theme-emoji-web .palette-readout,
+body.theme-emoji-web .os-readout,
+body.theme-emoji-web .splash-readout,
+body.theme-emoji-web .data-readout {
+    background: #000000;
+    color: #39ff14;
+    border: 2px inset #c0c0c0;
+    text-shadow: 0 0 8px #39ff14;
 }
 
 .theme-extra {
@@ -1027,15 +1150,96 @@ body.theme-concord .titlebar {
 }
 
 body.theme-emoji-web .titlebar {
-    background: linear-gradient(to right, #ff4df3, #fff200, #39ff14, #2fffff);
-    color: #170021;
+    background: #000080;
+    color: #ffffff;
+    border-bottom: 3px ridge #ffffff;
+    text-shadow: 1px 1px 0 #000000;
+}
+
+body.theme-emoji-web .window,
+body.theme-emoji-web .page-shell,
+body.theme-emoji-web .video-card,
+body.theme-emoji-web .gallery-card,
+body.theme-emoji-web .guestbook-panel {
+    background:
+        radial-gradient(circle at 8% 8%, rgba(255,255,255,0.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 88% 18%, rgba(255,242,0,0.28), transparent 18%),
+        #000000;
+    border: 4px ridge #c0c0c0;
+    box-shadow: 6px 6px 0 #808080, 0 0 18px #ff4df3;
+}
+
+body.theme-emoji-web .window-content h2,
+body.theme-emoji-web .window-content h3,
+body.theme-emoji-web .page-header h2,
+body.theme-emoji-web .gallery-card h3,
+body.theme-emoji-web .video-card h3 {
+    color: #fff200;
+    font-family: Georgia, "Times New Roman", serif;
+    text-shadow: 2px 2px 0 #800000, 0 0 10px #ff4df3;
 }
 
 body.theme-emoji-web .os-button,
 body.theme-emoji-web .task-button,
-body.theme-emoji-web .link-button {
+body.theme-emoji-web .link-button,
+body.theme-emoji-web .theme-chip {
     background: linear-gradient(to bottom, #ffffff, #fff200 28%, #39ff14 56%, #ff4df3);
     color: #160020;
+    border: 3px outset #ffffff;
+    box-shadow: 2px 2px 0 #000000;
+    text-shadow: none;
+}
+
+body.theme-emoji-web .theme-chip.active {
+    background: linear-gradient(90deg, #ff2600, #fff200, #39ff14, #2fffff, #ff4df3);
+    color: #000000;
+}
+
+body.theme-emoji-web .icon-art {
+    border: 3px outset #ffffff;
+    background: linear-gradient(135deg, #fff200, #39ff14 42%, #2fffff 70%, #ff4df3);
+    box-shadow: 0 0 12px #fff200;
+}
+
+body.theme-emoji-web .desktop-icon {
+    color: #ffffff;
+    text-shadow: 2px 2px 0 #000000, 0 0 8px #ff4df3;
+}
+
+body.theme-emoji-web .taskbar,
+body.theme-emoji-web .theme-tray {
+    background: #c0c0c0;
+    border: 3px ridge #ffffff;
+    box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #808080;
+}
+
+body.theme-emoji-web .badge {
+    background: #000000;
+    color: #fff200;
+    border: 2px dashed #ff4df3;
+    text-shadow: 0 0 8px #ff4df3;
+}
+
+body.theme-emoji-web .status-card,
+body.theme-emoji-web .terminal-screen,
+body.theme-emoji-web .file-preview,
+body.theme-emoji-web .now-playing {
+    background: #000000;
+    color: #39ff14;
+    border: 2px inset #c0c0c0;
+}
+
+body.theme-emoji-web .gif-slot {
+    border: 4px ridge #fff200;
+    background: #000000;
+    box-shadow: 0 0 14px #ff4df3;
+}
+
+body.theme-emoji-web .gif-caption {
+    color: #ff2600;
+    background: #fff200;
+    border-top: 3px ridge #ffffff;
+    text-shadow: 1px 1px 0 #ffffff;
 }
 
 .window-buttons { display: flex; gap: 4px; }
@@ -1427,6 +1631,88 @@ body.music-playing .volume-bars span:nth-child(6) { animation: barMove 0.22s eas
     flex-wrap: wrap;
     gap: 8px;
     justify-content: center;
+}
+
+body.music-playing .window,
+body.music-playing .desktop-icon,
+body.music-playing .taskbar,
+body.music-playing .theme-chip,
+body.music-playing .os-button,
+body.music-playing .task-button,
+body.music-playing .badge,
+body.music-playing .status-light,
+body.music-playing .gif-slot,
+body.music-playing .data-readout {
+    transition: transform 0.08s ease, filter 0.08s ease, box-shadow 0.08s ease;
+    will-change: transform;
+}
+
+body.music-beat .window.active {
+    transform: translateY(-3px) scale(1.006);
+    filter: brightness(1.08);
+}
+
+body.music-beat .desktop-icon:nth-child(odd) {
+    transform: translateY(-5px) scale(1.04) rotate(-1deg);
+}
+
+body.music-beat .desktop-icon:nth-child(even) {
+    transform: translateY(3px) scale(1.03) rotate(1deg);
+}
+
+body.music-beat .taskbar {
+    transform: translateY(-2px);
+}
+
+body.music-beat .theme-chip.active,
+body.music-beat .os-button:hover,
+body.music-beat .task-button:hover,
+body.music-beat .link-button:hover {
+    transform: translateY(-3px) scale(1.04);
+}
+
+body.music-beat .badge:nth-child(odd),
+body.music-beat .data-readout:nth-child(odd) {
+    transform: translateY(-3px) rotate(-1deg);
+}
+
+body.music-beat .badge:nth-child(even),
+body.music-beat .data-readout:nth-child(even) {
+    transform: translateY(2px) rotate(1deg);
+}
+
+body.music-beat .status-light {
+    transform: scale(1.28);
+    filter: brightness(1.35);
+}
+
+body.music-beat .gif-slot {
+    transform: translateY(-2px) scale(1.01);
+}
+
+body.theme-msdos.music-playing .window,
+body.theme-msdos.music-playing .desktop-icon,
+body.theme-msdos.music-playing .taskbar,
+body.theme-msdos.music-playing .theme-chip,
+body.theme-msdos.music-playing .os-button,
+body.theme-msdos.music-playing .task-button,
+body.theme-system-one.music-playing .window,
+body.theme-system-one.music-playing .desktop-icon,
+body.theme-system-one.music-playing .taskbar,
+body.theme-system-one.music-playing .theme-chip,
+body.theme-system-one.music-playing .os-button,
+body.theme-system-one.music-playing .task-button {
+    will-change: auto;
+}
+
+body.theme-msdos.music-beat .window.active,
+body.theme-msdos.music-beat .desktop-icon,
+body.theme-msdos.music-beat .taskbar,
+body.theme-system-one.music-beat .window.active,
+body.theme-system-one.music-beat .desktop-icon,
+body.theme-system-one.music-beat .taskbar {
+    transform: none;
+    filter: none;
 }
 
 .footer {

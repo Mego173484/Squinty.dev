@@ -1240,6 +1240,11 @@ function pulseRecord() {
     setTimeout(function() { record.classList.remove("beat"); }, 110);
 }
 
+function pulseInterface() {
+    document.body.classList.add("music-beat");
+    setTimeout(function() { document.body.classList.remove("music-beat"); }, 120);
+}
+
 function playNote(freq, duration) {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -1303,6 +1308,7 @@ function startMusic() {
         playNote(notes[step % notes.length], 0.14);
         bounceLetter();
         pulseRecord();
+        pulseInterface();
         if (step % 4 === 2) playSnare();
         step++;
     }, 200);
