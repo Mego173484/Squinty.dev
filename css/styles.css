@@ -241,6 +241,68 @@ body::after {
     line-height: 1.5;
 }
 
+body.theme-emoji-web .startup-screen,
+body.theme-emoji-web .terminated-screen {
+    background:
+        repeating-linear-gradient(to bottom, rgba(255,255,255,0.04), rgba(255,255,255,0.04) 1px, transparent 1px, transparent 5px),
+        radial-gradient(circle at 20% 22%, #fff200 0 10px, transparent 11px),
+        radial-gradient(circle at 82% 70%, rgba(47,255,255,0.28), transparent 22%),
+        #000000;
+}
+
+body.theme-emoji-web .startup-screen::before,
+body.theme-emoji-web .terminated-screen::before {
+    content: "";
+    position: absolute;
+    inset: -16%;
+    background:
+        repeating-radial-gradient(ellipse at center, transparent 0 34px, rgba(255,77,243,0.2) 35px 38px, transparent 39px 70px),
+        linear-gradient(90deg, transparent 0 20%, rgba(255,242,0,0.24) 21% 22%, transparent 23% 100%);
+    animation: synthWaveDrift 6s linear infinite;
+    pointer-events: none;
+}
+
+body.theme-emoji-web .startup-screen::after {
+    background: linear-gradient(120deg, transparent 35%, rgba(255,77,243,0.24) 48%, rgba(255,242,0,0.42) 50%, rgba(47,255,255,0.2) 52%, transparent 65%);
+}
+
+body.theme-emoji-web .startup-box,
+body.theme-emoji-web .terminated-box {
+    border: 5px ridge #c0c0c0;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(255,77,243,0.18), transparent 34%),
+        #000000;
+    box-shadow: 0 0 0 4px #808080, 0 0 30px #ff4df3, inset 0 0 30px rgba(47,255,255,0.14);
+}
+
+body.theme-emoji-web .startup-logo,
+body.theme-emoji-web .terminated-title {
+    color: #ff4df3;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    text-shadow: 4px 4px 0 #808080, 0 0 12px #ffffff, 0 0 28px #ff4df3;
+}
+
+body.theme-emoji-web .startup-subtitle,
+body.theme-emoji-web .terminated-text {
+    color: #fff200;
+    text-shadow: 1px 1px 0 #000000, 0 0 10px #39ff14;
+}
+
+body.theme-emoji-web .boot-lines {
+    border: 3px ridge #ffffff;
+    background: #c0c0c0;
+    color: #000080;
+    text-shadow: none;
+}
+
+body.theme-emoji-web .startup-button {
+    background: linear-gradient(to bottom, #ffffff, #fff200 28%, #39ff14 56%, #ff4df3);
+    color: #160020;
+    border: 4px outset #ffffff;
+    box-shadow: 2px 2px 0 #000000;
+}
+
 .wallpaper {
     position: fixed;
     inset: 0;
@@ -775,6 +837,82 @@ body.theme-emoji-web .subtitle {
     text-shadow: 1px 1px 0 #000000, 0 0 8px #39ff14;
 }
 
+body.theme-emoji-web .web-homepage-copy {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    max-width: 760px;
+    margin: 12px auto;
+    color: #ffff99;
+    font: bold 16px Georgia, "Times New Roman", serif;
+    text-align: center;
+    text-shadow: 1px 1px 0 #000000, 0 0 8px #39ff14;
+}
+
+body.theme-emoji-web .web-homepage-copy p {
+    display: inline-block;
+    margin: 0;
+    transition: transform 0.08s ease;
+}
+
+body.theme-emoji-web .web-rainbow-rule {
+    width: min(560px, 86%);
+    height: 5px;
+    background: linear-gradient(90deg, #ff2600, #fff200, #39ff14, #2fffff, #ff4df3);
+    box-shadow: 0 0 12px #ff4df3;
+}
+
+body.theme-emoji-web .web-song-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 5px 9px;
+    background: #c0c0c0;
+    border: 3px ridge #ffffff;
+    color: #000080;
+    font: bold 12px var(--terminal-font);
+    text-shadow: none;
+    box-shadow: 2px 2px 0 #808080;
+    transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+body.theme-emoji-web .web-player-buttons {
+    color: #008000;
+    letter-spacing: 2px;
+}
+
+body.theme-emoji-web .web-homepage-copy strong {
+    display: inline-block;
+    color: #ff2600;
+    font-family: var(--terminal-font);
+    animation: webBlink 0.8s steps(2, end) infinite;
+    transition: transform 0.08s ease;
+}
+
+body.theme-emoji-web.music-playing .web-rainbow-rule {
+    animation: rainbowSlide 1.2s linear infinite;
+    background-size: 200% 100%;
+}
+
+body.theme-emoji-web.music-beat .web-song-box {
+    transform: translateY(-3px) scale(1.06) rotate(-1deg);
+    filter: brightness(1.18) saturate(1.2);
+}
+
+body.theme-emoji-web.music-beat .web-homepage-copy p,
+body.theme-emoji-web.music-beat .web-homepage-copy strong {
+    transform: translateY(-2px) scale(1.02);
+}
+
+@keyframes rainbowSlide {
+    from { background-position: 0 0; }
+    to { background-position: 200% 0; }
+}
+
+@keyframes webBlink {
+    50% { opacity: 0.35; }
+}
+
 body.theme-emoji-web .palette-readout,
 body.theme-emoji-web .os-readout,
 body.theme-emoji-web .splash-readout,
@@ -842,6 +980,10 @@ h1 {
     font-size: 15px;
     margin: 8px auto 12px auto;
     max-width: 680px;
+}
+
+.web-homepage-copy {
+    display: none;
 }
 
 .palette-readout,
@@ -1407,6 +1549,10 @@ body.theme-emoji-web .gif-caption {
     box-shadow: inset 0 0 24px rgba(0,0,0,0.65), 0 0 18px rgba(77,255,223,0.45);
 }
 
+.web-audio-player {
+    display: none;
+}
+
 .vinyl-record {
     position: absolute;
     left: 18px;
@@ -1482,6 +1628,77 @@ body.music-playing .needle { animation: needleGroove 0.4s ease-in-out infinite a
 @keyframes needleGroove {
     from { transform: rotate(31deg); }
     to { transform: rotate(35deg); }
+}
+
+body.theme-emoji-web .vinyl-stage {
+    grid-template-columns: minmax(220px, 0.75fr) 1fr;
+}
+
+body.theme-emoji-web .turntable {
+    display: none;
+}
+
+body.theme-emoji-web .web-audio-player {
+    display: grid;
+    place-items: center;
+    min-height: 210px;
+    padding: 10px;
+    border: 4px ridge #c0c0c0;
+    background: #000000;
+    box-shadow: 0 0 16px #ff4df3, inset 0 0 28px rgba(47,255,255,0.16);
+}
+
+.web-player-screen {
+    width: min(220px, 100%);
+    aspect-ratio: 1.18;
+    display: grid;
+    place-items: center;
+    gap: 8px;
+    padding: 10px;
+    border: 3px inset #ffffff;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(255,242,0,0.24), transparent 30%),
+        radial-gradient(circle at 18% 18%, rgba(47,255,255,0.22), transparent 24%),
+        #000033;
+    transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+.web-player-title,
+.web-player-controls {
+    padding: 3px 6px;
+    background: #c0c0c0;
+    border: 2px outset #ffffff;
+    color: #000080;
+    font: bold 11px var(--terminal-font);
+    text-shadow: none;
+}
+
+.web-player-orbit {
+    width: 84px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 4px dotted #fff200;
+    background:
+        radial-gradient(circle, #39ff14 0 10px, transparent 11px),
+        radial-gradient(circle at 30% 36%, #ff4df3 0 6px, transparent 7px),
+        radial-gradient(circle at 70% 64%, #2fffff 0 7px, transparent 8px),
+        #08002b;
+    box-shadow: 0 0 18px #fff200, inset 0 0 18px #ff4df3;
+    animation: webPlayerOrbit 5s linear infinite;
+}
+
+body.theme-emoji-web.music-playing .web-player-orbit {
+    animation-duration: 1.4s;
+}
+
+body.theme-emoji-web.music-beat .web-player-screen {
+    filter: brightness(1.2) saturate(1.25);
+    transform: translateY(-3px) scale(1.03);
+}
+
+@keyframes webPlayerOrbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .now-playing {
@@ -1811,6 +2028,22 @@ body.theme-system-one.music-beat .desktop-icon,
 body.theme-system-one.music-beat .taskbar {
     transform: none;
     filter: none;
+}
+
+body.theme-emoji-web.music-playing .desktop::after {
+    animation-duration: 2.1s;
+    opacity: 0.72;
+}
+
+body.theme-emoji-web.music-beat .desktop::after {
+    opacity: 0.95;
+    filter: drop-shadow(0 0 16px #ff4df3) drop-shadow(0 0 18px #2fffff) brightness(1.28);
+    transform: translate3d(0, -10px, 0) skewY(-2deg) scaleY(1.04);
+}
+
+body.theme-emoji-web.music-beat .web-song-box {
+    transform: translateY(-3px) scale(1.06) rotate(-1deg);
+    filter: brightness(1.18) saturate(1.2);
 }
 
 .footer {
@@ -2166,6 +2399,58 @@ body.theme-emoji-web .gif-slot {
     font-size: 13px;
     text-align: center;
     text-shadow: 0 0 10px var(--green);
+}
+
+body.theme-emoji-web .screensaver {
+    background:
+        repeating-linear-gradient(to bottom, rgba(255,255,255,0.04), rgba(255,255,255,0.04) 1px, transparent 1px, transparent 5px),
+        radial-gradient(circle at 18% 24%, #fff200 0 9px, transparent 10px),
+        radial-gradient(circle at 78% 62%, rgba(47,255,255,0.3), transparent 22%),
+        #000000;
+}
+
+body.theme-emoji-web .screensaver::before {
+    background:
+        repeating-radial-gradient(ellipse at center, transparent 0 42px, rgba(255,77,243,0.3) 43px 46px, transparent 47px 82px),
+        conic-gradient(from 0deg, transparent, rgba(255,242,0,0.2), transparent, rgba(47,255,255,0.22), transparent);
+    animation: saverSpin 14s linear infinite, saverPulse 2.5s ease-in-out infinite alternate;
+}
+
+body.theme-emoji-web .screensaver::after {
+    background-image:
+        linear-gradient(rgba(255,77,243,0.28) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(47,255,255,0.22) 2px, transparent 2px);
+    opacity: 0.62;
+}
+
+body.theme-emoji-web .screensaver-core {
+    border: 4px ridge #c0c0c0;
+    border-radius: 0;
+    width: min(54vw, 500px);
+    background:
+        radial-gradient(circle at 28% 32%, #fff200 0 12px, transparent 13px),
+        radial-gradient(circle at 72% 58%, #2fffff 0 15px, transparent 16px),
+        #000033;
+    box-shadow: 0 0 26px #ff4df3, inset 0 0 28px rgba(255,242,0,0.16);
+}
+
+body.theme-emoji-web .screensaver-core::before,
+body.theme-emoji-web .screensaver-core::after {
+    border-color: #fff200;
+    box-shadow: 0 0 24px #ff4df3;
+}
+
+body.theme-emoji-web .screensaver-logo {
+    color: #ff4df3;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    text-shadow: 4px 4px 0 #808080, 0 0 14px #ffffff, 0 0 44px #ff4df3;
+}
+
+body.theme-emoji-web .screensaver-text,
+body.theme-emoji-web .saver-signal {
+    color: #fff200;
+    text-shadow: 1px 1px 0 #000000, 0 0 12px #39ff14;
 }
 
 .saver-signal {

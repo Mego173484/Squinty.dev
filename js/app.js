@@ -31,6 +31,17 @@ const bootLinePool = [
     "STARTUP FANFARE QUEUED"
 ];
 
+const webBootLinePool = [
+    "NETSCAPE CACHE: READY",
+    "LOADING SQUINKY WORLD",
+    "TUNING SPACE SONG",
+    "CHECKING GIF SPARKLES",
+    "OPENING PERSONAL HOME PAGE",
+    "RAINBOW DIVIDER: OK",
+    "VISITOR COUNTER: BLINKING",
+    "WEB PLANET ORBIT: STABLE"
+];
+
 const splashTexts = [
     "signal found",
     "running on old hardware",
@@ -57,6 +68,14 @@ const systemEvents = [
     "BACKGROUND EVENT: TINY STATIC BURST DETECTED.",
     "BACKGROUND EVENT: MUSIC BUFFER SLEEPING.",
     "BACKGROUND EVENT: PERSONAL WEB DISK STILL SPINNING."
+];
+
+const webEvents = [
+    "WEB EVENT: SQUINKY WORLD PLANET DRIFT.",
+    "WEB EVENT: SPACE SONG BUFFER TWINKLING.",
+    "WEB EVENT: GUESTBOOK STARS ARE BLINKING.",
+    "WEB EVENT: OLD INTERNET RAINBOW UPDATED.",
+    "WEB EVENT: NETSCAPE TOUR GUIDE WAVES HELLO."
 ];
 
 const blockedWords = [
@@ -118,6 +137,16 @@ const themeClasses = themes
 const startupScreen = document.getElementById("startupScreen");
 const terminatedScreen = document.getElementById("terminatedScreen");
 const screensaver = document.getElementById("screensaver");
+const startupLogo = document.getElementById("startupLogo");
+const startupSubtitle = document.getElementById("startupSubtitle");
+const pressStartText = document.getElementById("pressStartText");
+const terminatedTitle = document.getElementById("terminatedTitle");
+const terminatedText = document.getElementById("terminatedText");
+const screensaverLogo = document.getElementById("screensaverLogo");
+const screensaverText = document.getElementById("screensaverText");
+const saverSignalOne = document.getElementById("saverSignalOne");
+const saverSignalTwo = document.getElementById("saverSignalTwo");
+const saverSignalThree = document.getElementById("saverSignalThree");
 const driverLoader = document.getElementById("driverLoader");
 const driverTitle = document.getElementById("driverTitle");
 const driverLine = document.getElementById("driverLine");
@@ -137,6 +166,7 @@ const terminalOutput = document.getElementById("terminalOutput");
 const terminalInput = document.getElementById("terminalInput");
 const terminalForm = document.getElementById("terminalForm");
 const record = document.getElementById("record");
+const osReadout = document.getElementById("osReadout");
 const paletteReadout = document.getElementById("paletteReadout");
 const splashReadout = document.getElementById("splashReadout");
 const themeFlash = document.getElementById("themeFlash");
@@ -144,15 +174,20 @@ const themeTray = document.getElementById("themeTray");
 const clockReadout = document.getElementById("clockReadout");
 const uptimeReadout = document.getElementById("uptimeReadout");
 const signalReadout = document.getElementById("signalReadout");
-const visitorCount = document.getElementById("visitorCount");
-const visitorToday = document.getElementById("visitorToday");
-const counterMode = document.getElementById("counterMode");
+let visitorCount = document.getElementById("visitorCount");
+let visitorToday = document.getElementById("visitorToday");
+let counterMode = document.getElementById("counterMode");
 const filePreview = document.getElementById("filePreview");
 const guestbookForm = document.getElementById("guestbookForm");
 const guestbookName = document.getElementById("guestbookName");
 const guestbookMessage = document.getElementById("guestbookMessage");
 const guestbookStatus = document.getElementById("guestbookStatus");
 const guestbookList = document.getElementById("guestbookList");
+const marqueeText = document.querySelector(".marquee span");
+const trackTitle = document.getElementById("trackTitle");
+const trackDetails = document.getElementById("trackDetails");
+const musicWindowTitle = document.getElementById("musicWindowTitle");
+const musicHeading = document.getElementById("musicHeading");
 
 // Initial render
 logoText.split("").forEach(function(letter) {
@@ -170,6 +205,7 @@ themeExtra.className = "theme-extra";
 subtitle.appendChild(themeExtra);
 const logoLetters = document.querySelectorAll(".logo-letter");
 const notes = [392, 523, 659, 523, 440, 587, 740, 587, 349, 440, 523, 440, 330, 392, 494, 392];
+const webNotes = [523, 659, 784, 988, 880, 784, 659, 587, 659, 784, 1047, 988, 784, 659, 587, 523];
 
 themes.forEach(function(theme, index) {
     const button = document.createElement("button");
@@ -303,8 +339,8 @@ function enterSite() {
     startupScreen.classList.add("hidden");
     startupScreen.classList.remove("visible");
     startWaveBorder();
-    addLine("SQUINKYDOS FANFARE COMPLETE.");
-    addLine("SYSTEM ONLINE.");
+    addLine(isEmojiWebTheme() ? "SQUINKY WORLD PAGE LOADED." : "SQUINKYDOS FANFARE COMPLETE.");
+    addLine(isEmojiWebTheme() ? "WELCOME, WEB TRAVELER." : "SYSTEM ONLINE.");
     scheduleSystemEvent();
 }
 
@@ -386,6 +422,13 @@ function updateDynamicReadouts() {
     const seconds = uptimeSeconds % 60;
     const signal = 72 + Math.floor(Math.sin(Date.now() / 1400) * 12) + Math.floor(Math.random() * 5);
 
+    if (isEmojiWebTheme()) {
+        clockReadout.textContent = "LOCAL TIME " + now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        uptimeReadout.textContent = "WEB TOUR " + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+        signalReadout.textContent = "SPARKLES " + Math.max(44, Math.min(99, signal)) + "%";
+        return;
+    }
+
     clockReadout.textContent = "TIME " + now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     uptimeReadout.textContent = "UPTIME " + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
     signalReadout.textContent = "SIGNAL " + Math.max(44, Math.min(99, signal)) + "%";
@@ -395,7 +438,8 @@ function scheduleSystemEvent() {
     clearTimeout(systemEventTimer);
     systemEventTimer = setTimeout(function() {
         if (!isTerminated && startupScreen.classList.contains("hidden") && !screensaverActive) {
-            addLine(systemEvents[Math.floor(Math.random() * systemEvents.length)]);
+            const events = isEmojiWebTheme() ? webEvents : systemEvents;
+            addLine(events[Math.floor(Math.random() * events.length)]);
         }
 
         scheduleSystemEvent();
@@ -419,7 +463,7 @@ function makeClickSpark(event) {
 // Startup, splash, and local visit counter
 function renderBootLines() {
     const count = randomInt(4, 6);
-    const chosenLines = shuffleArray(bootLinePool).slice(0, count);
+    const chosenLines = shuffleArray(isEmojiWebTheme() ? webBootLinePool : bootLinePool).slice(0, count);
     bootLines.innerHTML = chosenLines.join("<br>");
 }
 
@@ -433,7 +477,7 @@ function rerollSplash(announce) {
     }
 
     currentSplash = nextSplash;
-    splashReadout.textContent = "SPLASH: " + currentSplash;
+    splashReadout.textContent = isEmojiWebTheme() ? "WEB PAGE: SPACE SONG LOADED" : "SPLASH: " + currentSplash;
 
     if (announce) {
         addLine("SPLASH TEXT: " + currentSplash.toUpperCase() + ".");
@@ -951,6 +995,69 @@ function cycleTheme() {
     setTheme((themeIndex + 1) % themes.length, true);
 }
 
+function isEmojiWebTheme() {
+    return themes[themeIndex] && themes[themeIndex].className === "theme-emoji-web";
+}
+
+function setMarqueeHtml(html) {
+    marqueeText.innerHTML = html;
+    visitorCount = document.getElementById("visitorCount");
+    visitorToday = document.getElementById("visitorToday");
+    counterMode = document.getElementById("counterMode");
+}
+
+function syncThemeCopy() {
+    if (isEmojiWebTheme()) {
+        subtitle.firstChild.nodeValue = "Welcome to Squinky World, a handmade web planet on squinky.dev.";
+        osReadout.textContent = "WELCOME TO SQUINKY WORLD";
+        splashReadout.textContent = "WEB PAGE: SPACE SONG LOADED";
+        setMarqueeHtml("WELCOME TO SQUINKY WORLD :: REAL VISITS <b id=\"visitorCount\">----</b> :: TODAY <b id=\"visitorToday\">--</b> :: <b id=\"counterMode\">SYNCING</b> :: GIFS :: SPACE SONG :: MOD LINKS :: OLD INTERNET");
+        trackTitle.textContent = "Squinky World space song";
+        trackDetails.textContent = "sparkle arps / web drums / browser audio";
+        musicWindowTitle.textContent = "REAL_AUDIO_SPACE_SONG.RAM";
+        musicHeading.textContent = "Web Audio Player";
+        startupLogo.textContent = "Squinky World";
+        startupSubtitle.textContent = "NETSCAPE PAGE LOADER";
+        pressStartText.textContent = "ENTER SQUINKY WORLD";
+        terminatedTitle.textContent = "squinky world closed";
+        terminatedText.innerHTML = "BROWSER WINDOW CLOSED<br>Thanks for visiting this tiny web planet.";
+        screensaverLogo.textContent = "SQUINKY WORLD";
+        saverSignalOne.textContent = "PLANET TOUR";
+        saverSignalTwo.textContent = "GIF ZONE";
+        saverSignalThree.textContent = "SPACE SONG";
+        screensaverText.innerHTML = "web screensaver active<br>move / tap / press any key to return";
+        document.getElementById("musicButton").innerText = isPlaying ? "STOP SPACE SONG" : "PLAY SPACE SONG";
+        document.getElementById("warpButton").innerText = "SURF WARP";
+        document.getElementById("colorButton").innerText = "NEXT WEB LOOK";
+        document.getElementById("resetButton").innerText = "HOME PAGE";
+        document.getElementById("terminateButton").innerText = "CLOSE PAGE";
+    } else {
+        subtitle.firstChild.nodeValue = "Running squinkyDOS from an old personal web computer.";
+        osReadout.textContent = "squinkyDOS VERSION " + DOS_VERSION;
+        setMarqueeHtml("squinkyDOS 173484 :: REAL VISITS <b id=\"visitorCount\">----</b> :: TODAY <b id=\"visitorToday\">--</b> :: <b id=\"counterMode\">SYNCING</b> :: VIDEOS :: MOD NOTES :: MUSIC PLAYER :: OLD COMPUTER MODE");
+        trackTitle.textContent = "Squinky loop";
+        trackDetails.textContent = "square synth / snare / browser audio";
+        musicWindowTitle.textContent = "MUSIC_PLAYER.EXE";
+        musicHeading.textContent = "Music Player";
+        startupLogo.textContent = "squinkyDOS";
+        startupSubtitle.textContent = "VERSION " + DOS_VERSION;
+        pressStartText.textContent = "BOOT SQUINKYDOS";
+        terminatedTitle.textContent = "squinkyDOS terminated";
+        terminatedText.innerHTML = "SYSTEM HALTED<br>It is now safe to restart the old computer.";
+        screensaverLogo.textContent = "SQUINKY.DEV";
+        saverSignalOne.textContent = "SIGNAL FOUND";
+        saverSignalTwo.textContent = DOS_VERSION;
+        saverSignalThree.textContent = "GREEN CHANNEL";
+        screensaverText.innerHTML = "screensaver active<br>move / tap / press any key to return";
+        splashReadout.textContent = "SPLASH: " + currentSplash;
+        document.getElementById("musicButton").innerText = isPlaying ? "MUTE MUSIC" : "START MUSIC";
+        document.getElementById("warpButton").innerText = "SQUINK WARP";
+        document.getElementById("colorButton").innerText = "COLOR SHIFT";
+        document.getElementById("resetButton").innerText = "RESET OS";
+        document.getElementById("terminateButton").innerText = "TERMINATE OS";
+    }
+}
+
 function setTheme(index, announce) {
     themeIndex = index;
     const theme = themes[themeIndex];
@@ -968,10 +1075,13 @@ function setTheme(index, announce) {
         button.classList.toggle("active", Number(button.dataset.themeIndex) === themeIndex);
     });
     paletteReadout.textContent = "PALETTE: " + theme.name + " [" + (themeIndex + 1) + "/" + themes.length + "]";
+    syncThemeCopy();
+    updateDynamicReadouts();
+    recordVisitorCount();
     if (announce) {
         playAssetSound("blip", 0.18);
-        showThemeFlash("COLOR SHIFT: " + theme.name);
-        addLine("COLOR SHIFT: " + theme.name + ".");
+        showThemeFlash(isEmojiWebTheme() ? "ENTERING SQUINKY WORLD" : "COLOR SHIFT: " + theme.name);
+        addLine(isEmojiWebTheme() ? "WEB PAGE OPENED: SQUINKY WORLD." : "COLOR SHIFT: " + theme.name + ".");
     }
     document.body.style.filter = "saturate(1.45) brightness(1.08)";
     setTimeout(function() { document.body.style.filter = ""; }, 250);
@@ -1003,8 +1113,9 @@ function resetOS() {
     borderBoost = 32;
     bootTimestamp = Date.now();
     updateDynamicReadouts();
-    document.getElementById("musicButton").innerText = "START MUSIC";
+    document.getElementById("musicButton").innerText = isEmojiWebTheme() ? "PLAY SPACE SONG" : "START MUSIC";
     document.getElementById("musicButton2").innerText = "PLAY / MUTE";
+    syncThemeCopy();
     terminalOutput.innerHTML = "";
     addLine("RESETTING SQUINKYDOS...");
     addLine("VERSION 173484 WAITING FOR START.");
@@ -1066,16 +1177,16 @@ function toggleMusic() {
         startMusic();
         isPlaying = true;
         document.body.classList.add("music-playing");
-        document.getElementById("musicButton").innerText = "MUTE MUSIC";
+        document.getElementById("musicButton").innerText = isEmojiWebTheme() ? "STOP SPACE SONG" : "MUTE MUSIC";
         document.getElementById("musicButton2").innerText = "PLAYING";
-        addLine("MUSIC SYSTEM ONLINE.");
+        addLine(isEmojiWebTheme() ? "SPACE SONG PLAYING ON SQUINKY WORLD." : "MUSIC SYSTEM ONLINE.");
     } else {
         stopMusic();
         isPlaying = false;
         document.body.classList.remove("music-playing");
-        document.getElementById("musicButton").innerText = "START MUSIC";
+        document.getElementById("musicButton").innerText = isEmojiWebTheme() ? "PLAY SPACE SONG" : "START MUSIC";
         document.getElementById("musicButton2").innerText = "PLAY / MUTE";
-        addLine("MUSIC SYSTEM MUTED.");
+        addLine(isEmojiWebTheme() ? "SPACE SONG STOPPED." : "MUSIC SYSTEM MUTED.");
     }
 }
 
@@ -1219,7 +1330,8 @@ function bounceLogoLetter(index, className) {
 function playLogoKey(index) {
     if (!ensureAudio()) return;
 
-    const note = notes[index % notes.length];
+    const activeNotes = isEmojiWebTheme() ? webNotes : notes;
+    const note = activeNotes[index % activeNotes.length];
     playNote(note, 0.16);
     bounceLogoLetter(index, "bounce-wide");
 
@@ -1308,7 +1420,12 @@ function playWarpSound() {
 function startMusic() {
     if (musicTimer) return;
     musicTimer = setInterval(function() {
-        playNote(notes[step % notes.length], 0.14);
+        const activeNotes = isEmojiWebTheme() ? webNotes : notes;
+        const activeDuration = isEmojiWebTheme() ? 0.11 : 0.14;
+        playNote(activeNotes[step % activeNotes.length], activeDuration);
+        if (isEmojiWebTheme() && step % 4 === 0) {
+            playNote(activeNotes[(step + 4) % activeNotes.length] * 2, 0.08);
+        }
         bounceLetter();
         pulseRecord();
         pulseInterface();

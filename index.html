@@ -9,8 +9,8 @@
 <body>
 <div class="startup-screen" id="startupScreen">
     <div class="startup-box">
-        <h2 class="startup-logo">squinkyDOS</h2>
-        <div class="startup-subtitle">VERSION 173484</div>
+        <h2 class="startup-logo" id="startupLogo">squinkyDOS</h2>
+        <div class="startup-subtitle" id="startupSubtitle">VERSION 173484</div>
         <div class="boot-lines" id="bootLines">
             MEMORY CHECK: OK<br>
             OLD COMPUTER DETECTED<br>
@@ -19,14 +19,14 @@
         </div>
         <div class="startup-loading"><div class="startup-loading-fill"></div></div>
         <button class="startup-button" id="enterSiteButton">PRESS START</button>
-        <div class="press-start">BOOT SQUINKYDOS</div>
+        <div class="press-start" id="pressStartText">BOOT SQUINKYDOS</div>
     </div>
 </div>
 
 <div class="terminated-screen" id="terminatedScreen">
     <div class="terminated-box">
-        <h2 class="terminated-title">squinkyDOS terminated</h2>
-        <div class="terminated-text">
+        <h2 class="terminated-title" id="terminatedTitle">squinkyDOS terminated</h2>
+        <div class="terminated-text" id="terminatedText">
             SYSTEM HALTED<br>
             It is now safe to restart the old computer.
         </div>
@@ -37,11 +37,11 @@
 
 <div class="screensaver" id="screensaver">
     <div class="screensaver-core"></div>
-    <div class="screensaver-logo">SQUINKY.DEV</div>
-    <div class="saver-signal one">SIGNAL FOUND</div>
-    <div class="saver-signal two">173484</div>
-    <div class="saver-signal three">GREEN CHANNEL</div>
-    <div class="screensaver-text">screensaver active<br>move / tap / press any key to return</div>
+    <div class="screensaver-logo" id="screensaverLogo">SQUINKY.DEV</div>
+    <div class="saver-signal one" id="saverSignalOne">SIGNAL FOUND</div>
+    <div class="saver-signal two" id="saverSignalTwo">173484</div>
+    <div class="saver-signal three" id="saverSignalThree">GREEN CHANNEL</div>
+    <div class="screensaver-text" id="screensaverText">screensaver active<br>move / tap / press any key to return</div>
 </div>
 
 <div class="driver-loader" id="driverLoader">
@@ -67,6 +67,15 @@
         <section class="top-area">
             <h1 id="logo"></h1>
             <div class="subtitle">Running squinkyDOS from an old personal web computer.</div>
+            <div class="web-homepage-copy">
+                <p>You have arrived at Squinky World, a tiny web planet orbiting squinky.dev.</p>
+                <div class="web-rainbow-rule"></div>
+                <div class="web-song-box">
+                    <span>REAL AUDIO SPACE SONG</span>
+                    <span class="web-player-buttons">◀ ▶ ■ ●</span>
+                </div>
+                <strong>&lt;&lt;&lt; SCROLL DOWN THE PAGE NOW &gt;&gt;&gt;</strong>
+            </div>
             <div class="os-readout" id="osReadout">squinkyDOS VERSION 173484</div>
             <div class="palette-readout" id="paletteReadout">PALETTE: GREEN-BLUE</div>
             <div class="splash-readout" id="splashReadout">SPLASH: loading signal</div>
@@ -116,18 +125,25 @@
 
             <article class="window" id="musicWindow">
                 <div class="titlebar">
-                    <span>MUSIC_PLAYER.EXE</span>
+                    <span id="musicWindowTitle">MUSIC_PLAYER.EXE</span>
                     <span class="window-buttons"><button class="fake-button green" type="button" data-window-action="focus" aria-label="Focus window"></button><button class="fake-button blue" type="button" data-window-action="minimize" aria-label="Collapse window"></button><button class="fake-button" type="button" data-window-action="close" aria-label="Close window"></button></span>
                 </div>
                 <div class="window-content">
-                    <h2>Music Player</h2>
+                    <h2 id="musicHeading">Music Player</h2>
                     <div class="vinyl-stage">
                         <div class="turntable"><div class="vinyl-record" id="record"></div><div class="needle"></div></div>
+                        <div class="web-audio-player" aria-hidden="true">
+                            <div class="web-player-screen">
+                                <div class="web-player-title">RealAudio Space Song</div>
+                                <div class="web-player-orbit"></div>
+                                <div class="web-player-controls">◀ ▶ ■ ●</div>
+                            </div>
+                        </div>
                         <div class="vinyl-info">
                             <div class="now-playing">
                                 <strong>Now playing:</strong><br>
-                                Squinky loop<br>
-                                <span class="small-text">square synth / snare / browser audio</span>
+                                <span id="trackTitle">Squinky loop</span><br>
+                                <span class="small-text" id="trackDetails">square synth / snare / browser audio</span>
                             </div>
                             <button class="os-button" id="musicButton2">PLAY / MUTE</button>
                             <div class="volume-bars"><span></span><span></span><span></span><span></span><span></span><span></span></div>
