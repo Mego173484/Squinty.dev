@@ -11,7 +11,7 @@ const env = {
     GUESTBOOK: {
         async get(key, type) {
             const data = await readStore();
-            const value = data[key] || null;
+            const value = await readValue(data, key);
 
             if (type === "json" && value) {
                 return JSON.parse(value);
@@ -19,9 +19,14 @@ const env = {
 
             return value;
         },
-        async put(key, value) {
+        async put(key, value, options = {}) {
             const data = await readStore();
-            data[key] = value;
+            data[key] = {
+                value,
+                expiresAt: options.expirationTtl
+                    ? Date.now() + options.expirationTtl * 1000
+                    : null
+            };
             await writeStore(data);
         }
     }
@@ -67,4 +72,28 @@ async function readStore() {
 async function writeStore(data) {
     await mkdir(dirname(dataFile), { recursive: true });
     await writeFile(dataFile, JSON.stringify(data, null, 2));
+}
+
+async function readValue(data, key) {
+    const record = data[key];
+
+    if (!record) return null;
+
+    if (typeof record === "object" && Object.prototype.hasOwnProperty.call(record, "value")) {
+        if (record.expiresAt && record.expiresAt <= Date.now()) {
+            delete data[key];
+            await writeStore(data);
+            return null;
+        }
+
+        return record.value;
+    }
+
+    if (key.startsWith("guestbook:rate:")) {
+        delete data[key];
+        await writeStore(data);
+        return null;
+    }
+
+    return record;
 }
