@@ -14,6 +14,7 @@ const SFX_PATHS = {
     error: "assets/sfx/buzzer.mp3",
     keyboard: "assets/sfx/keyboard-noise.mp3"
 };
+const SFX_POOL_SIZE = 4;
 
 // Boot and flavor text pools
 const bootLinePool = [
@@ -415,26 +416,42 @@ function playAssetSound(name, volume) {
 
     try {
         if (!sfxPlayers[name]) {
-            sfxPlayers[name] = new Audio(SFX_PATHS[name]);
-            sfxPlayers[name].preload = "auto";
+            sfxPlayers[name] = {
+                index: 0,
+                players: Array.from({ length: SFX_POOL_SIZE }, function() {
+                    const player = new Audio(SFX_PATHS[name]);
+                    player.preload = "auto";
+                    player.load();
+                    return player;
+                })
+            };
         }
 
-        const player = sfxPlayers[name];
+        const pool = sfxPlayers[name];
+        const player = pool.players[pool.index];
+        pool.index = (pool.index + 1) % pool.players.length;
         player.pause();
-        player.currentTime = 0;
-        player.volume = volume;
-        player.play().catch(function() {});
+        try {
+            player.currentTime = 0;
+        } catch (error) {}
+        player.volume = Math.max(0, Math.min(1, volume));
+        const playPromise = player.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+            playPromise.catch(function() {});
+        }
+        return player;
     } catch (error) {}
 }
 
 function playTimedAssetSound(name, volume, duration) {
-    playAssetSound(name, volume);
+    const player = playAssetSound(name, volume);
+    if (!player) return;
 
     setTimeout(function() {
-        const player = sfxPlayers[name];
-        if (!player) return;
         player.pause();
-        player.currentTime = 0;
+        try {
+            player.currentTime = 0;
+        } catch (error) {}
     }, duration);
 }
 

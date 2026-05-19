@@ -968,13 +968,17 @@ body.theme-system-one .marquee {
     box-shadow: inset 0 -1px 0 #000000;
 }
 
+body.theme-system-one #waveBorder {
+    display: none;
+}
+
 body.theme-system-one .desktop,
 body.theme-system-one .page-shell {
     background:
-        repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0 1px, transparent 1px 4px),
-        #d8d8d8;
+        repeating-linear-gradient(45deg, rgba(0,0,0,0.055) 0 1px, transparent 1px 6px),
+        #d6d6d6;
     border: 2px solid #000000;
-    box-shadow: 8px 8px 0 rgba(0,0,0,0.18);
+    box-shadow: 7px 7px 0 rgba(0,0,0,0.22);
     color: #111111;
     animation: none;
 }
@@ -1004,6 +1008,13 @@ body.theme-system-one .page-header h2 {
     letter-spacing: 0;
 }
 
+body.theme-system-one .subtitle,
+body.theme-system-one .top-area .small-text,
+body.theme-system-one .page-header p {
+    color: #000000;
+    text-shadow: none;
+}
+
 body.theme-system-one .window,
 body.theme-system-one .video-card,
 body.theme-system-one .gallery-card,
@@ -1013,6 +1024,95 @@ body.theme-system-one .guestbook-panel {
     box-shadow: none;
     color: #111111;
     overflow: auto;
+}
+
+body.theme-system-one .window-content,
+body.theme-system-one .window-content h2,
+body.theme-system-one .window-content h3,
+body.theme-system-one .guestbook-panel h3,
+body.theme-system-one .gallery-card h3,
+body.theme-system-one .video-card h3,
+body.theme-system-one .progress-label,
+body.theme-system-one .badge,
+body.theme-system-one .status-card,
+body.theme-system-one .guestbook-form label,
+body.theme-system-one .guestbook-status,
+body.theme-system-one .guestbook-entry-name,
+body.theme-system-one .guestbook-entry-date,
+body.theme-system-one .guestbook-entry-message,
+body.theme-system-one .guestbook-empty,
+body.theme-system-one p,
+body.theme-system-one li {
+    color: #000000;
+    text-shadow: none;
+}
+
+body.theme-system-one .video-frame {
+    border: 2px solid #000000;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+body.theme-system-one .video-frame iframe,
+body.theme-system-one img {
+    filter: grayscale(1) contrast(1.05);
+}
+
+body.theme-system-one .fake-button {
+    width: 12px;
+    height: 12px;
+    border: 1px solid #000000;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+body.theme-system-one .fake-button.green,
+body.theme-system-one .fake-button.blue {
+    background: #d8d8d8;
+}
+
+body.theme-system-one .badge,
+body.theme-system-one .status-card,
+body.theme-system-one .devlog,
+body.theme-system-one .guestbook-status,
+body.theme-system-one .guestbook-entry,
+body.theme-system-one .guestbook-empty {
+    border: 1px dotted #000000;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+body.theme-system-one .status-light,
+body.theme-system-one .status-light.alert {
+    border-radius: 50%;
+    background: #000000;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,0.45);
+}
+
+body.theme-system-one .progress-shell {
+    border: 1px solid #000000;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+body.theme-system-one .progress-fill,
+body.theme-system-one .volume-bars span {
+    background: repeating-linear-gradient(90deg, #000000 0 8px, #ffffff 8px 12px);
+    box-shadow: none;
+}
+
+body.theme-system-one .guestbook-form input,
+body.theme-system-one .guestbook-form textarea {
+    border: 2px solid #000000;
+    background: #ffffff;
+    color: #000000;
+    box-shadow: none;
+}
+
+body.theme-system-one .taskbar {
+    background: #ffffff;
+    border: 2px solid #000000;
+    box-shadow: none;
 }
 
 body.theme-system-one .small-text,
