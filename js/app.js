@@ -244,6 +244,13 @@ const trackTitle = document.getElementById("trackTitle");
 const trackDetails = document.getElementById("trackDetails");
 const musicWindowTitle = document.getElementById("musicWindowTitle");
 const musicHeading = document.getElementById("musicHeading");
+const webSongButton = document.getElementById("webSongButton");
+const paintCanvas = document.getElementById("paintCanvas");
+const clearPaintButton = document.getElementById("clearPaintButton");
+const paintTools = document.querySelectorAll("[data-paint-size]");
+const paintCtx = paintCanvas ? paintCanvas.getContext("2d") : null;
+let paintPointerDown = false;
+let paintSize = 2;
 
 // Initial render
 logoText.split("").forEach(function(letter) {
@@ -311,6 +318,7 @@ document.getElementById("warpButton").addEventListener("click", startRealityWarp
 document.getElementById("colorButton").addEventListener("click", cycleTheme);
 document.getElementById("resetButton").addEventListener("click", resetOS);
 document.getElementById("terminateButton").addEventListener("click", terminateOS);
+if (webSongButton) webSongButton.addEventListener("click", toggleMusic);
 
 logoLetters.forEach(function(letter, index) {
     letter.addEventListener("click", function() { playLogoKey(index); });
@@ -348,6 +356,28 @@ document.querySelectorAll("[data-theme-index]").forEach(function(button) {
 document.querySelectorAll("[data-file]").forEach(function(button) {
     button.addEventListener("click", function() { openFile(button.dataset.file); });
 });
+
+paintTools.forEach(function(button) {
+    button.addEventListener("click", function() {
+        paintSize = Number(button.dataset.paintSize) || 2;
+        paintTools.forEach(function(tool) { tool.classList.toggle("active", tool === button); });
+    });
+});
+
+if (clearPaintButton && paintCtx && paintCanvas) {
+    clearPaintButton.addEventListener("click", function() {
+        clearPaintCanvas();
+        playAssetSound("blip", 0.16);
+    });
+}
+
+if (paintCanvas && paintCtx) {
+    paintCanvas.addEventListener("pointerdown", beginPaintStroke);
+    paintCanvas.addEventListener("pointermove", continuePaintStroke);
+    paintCanvas.addEventListener("pointerup", endPaintStroke);
+    paintCanvas.addEventListener("pointerleave", endPaintStroke);
+    clearPaintCanvas();
+}
 
 document.querySelector(".terminal-input-row").addEventListener("click", function() {
     terminalInput.focus();
@@ -831,6 +861,53 @@ function shuffleArray(items) {
     return copy;
 }
 
+// Tiny System 1 drawing app
+function clearPaintCanvas() {
+    if (!paintCanvas || !paintCtx) return;
+    paintCtx.fillStyle = "#ffffff";
+    paintCtx.fillRect(0, 0, paintCanvas.width, paintCanvas.height);
+    paintCtx.strokeStyle = "#000000";
+    paintCtx.lineWidth = 1;
+    paintCtx.strokeRect(0.5, 0.5, paintCanvas.width - 1, paintCanvas.height - 1);
+}
+
+function getPaintPoint(event) {
+    const rect = paintCanvas.getBoundingClientRect();
+    return {
+        x: (event.clientX - rect.left) * (paintCanvas.width / rect.width),
+        y: (event.clientY - rect.top) * (paintCanvas.height / rect.height)
+    };
+}
+
+function beginPaintStroke(event) {
+    if (!paintCanvas || !paintCtx) return;
+    paintPointerDown = true;
+    paintCanvas.setPointerCapture(event.pointerId);
+    const point = getPaintPoint(event);
+    paintCtx.beginPath();
+    paintCtx.moveTo(point.x, point.y);
+    paintCtx.lineCap = "square";
+    paintCtx.lineJoin = "miter";
+    paintCtx.strokeStyle = "#000000";
+    paintCtx.lineWidth = paintSize;
+    playAssetSound("blip", 0.08);
+}
+
+function continuePaintStroke(event) {
+    if (!paintPointerDown || !paintCanvas || !paintCtx) return;
+    const point = getPaintPoint(event);
+    paintCtx.lineTo(point.x, point.y);
+    paintCtx.stroke();
+}
+
+function endPaintStroke(event) {
+    if (!paintPointerDown || !paintCanvas || !paintCtx) return;
+    paintPointerDown = false;
+    try {
+        paintCanvas.releasePointerCapture(event.pointerId);
+    } catch (error) {}
+}
+
 // Terminal commands
 function runCommand(rawCommand) {
     const command = rawCommand.toLowerCase().replace(/\s+/g, " ").trim();
@@ -1018,8 +1095,12 @@ function setFilePreview(text) {
 function loadPage(pageId) {
     noteUserActivity();
     hideScreensaver();
-    playDriverBootSound();
-    playTimedAssetSound("dialup", 0.2, 1800);
+    if (isEmojiWebTheme()) {
+        playAssetSound("blip", 0.18);
+    } else {
+        playDriverBootSound();
+        playTimedAssetSound("dialup", 0.2, 1800);
+    }
 
     const labels = {
         homePage: "DESKTOP DRIVER",
@@ -1028,9 +1109,9 @@ function loadPage(pageId) {
         guestbookPage: "GUESTBOOK DRIVER"
     };
 
-    driverTitle.textContent = "LOADING " + (labels[pageId] || "PAGE DRIVER");
-    driverLine.textContent = "MOUNTING " + pageId.toUpperCase() + "...";
-    driverLoader.classList.add("visible");
+    driverTitle.textContent = isEmojiWebTheme() ? "NETSCAPE NAVIGATOR" : "LOADING " + (labels[pageId] || "PAGE DRIVER");
+    driverLine.textContent = isEmojiWebTheme() ? "Opening " + pageId + "..." : "MOUNTING " + pageId.toUpperCase() + "...";
+    if (!isEmojiWebTheme()) driverLoader.classList.add("visible");
 
     setTimeout(function() {
         homePage.classList.toggle("hidden-view", pageId !== "homePage");
@@ -1047,7 +1128,7 @@ function loadPage(pageId) {
         }
         addLine("PAGE DRIVER LOADED: " + (labels[pageId] || pageId).toUpperCase() + ".");
         window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 1120);
+    }, isEmojiWebTheme() ? 180 : 1120);
 }
 
 function showHomeImmediately() {
@@ -1106,6 +1187,59 @@ function isDosTheme() {
 
 function isSystemOneTheme() {
     return themes[themeIndex] && themes[themeIndex].className === "theme-system-one";
+}
+
+function isConcordTheme() {
+    return themes[themeIndex] && themes[themeIndex].className === "theme-concord";
+}
+
+function getWaveBorderConfig() {
+    if (isSystemOneTheme() || isDosTheme() || isC64Theme()) {
+        return { visible: false };
+    }
+
+    if (isEmojiWebTheme()) {
+        return {
+            visible: true,
+            fitViewport: true,
+            idleColor: "rgba(255, 242, 0, 0.86)",
+            activeColor: "#ff4df3",
+            shadowColor: "#2fffff",
+            lineWidth: 6,
+            padding: 20,
+            points: window.innerWidth <= 820 ? 36 : 58,
+            idleShadow: 10,
+            activeShadow: 18
+        };
+    }
+
+    if (isConcordTheme()) {
+        return {
+            visible: true,
+            fitViewport: false,
+            idleColor: "rgba(247, 251, 255, 0.58)",
+            activeColor: "#f7fbff",
+            shadowColor: "#ff3d3d",
+            lineWidth: 3,
+            padding: 30,
+            points: window.innerWidth <= 820 ? 38 : 60,
+            idleShadow: 14,
+            activeShadow: 22
+        };
+    }
+
+    return {
+        visible: true,
+        fitViewport: false,
+        idleColor: "rgba(77,255,223,0.75)",
+        activeColor: "#4dffdf",
+        shadowColor: "#2cff6a",
+        lineWidth: 4,
+        padding: 28,
+        points: window.innerWidth <= 820 ? 42 : 72,
+        idleShadow: 16,
+        activeShadow: 24
+    };
 }
 
 function setMarqueeHtml(html) {
@@ -1311,6 +1445,8 @@ function setTheme(index, announce) {
     });
     paletteReadout.textContent = "PALETTE: " + theme.name + " [" + (themeIndex + 1) + "/" + themes.length + "]";
     syncThemeCopy();
+    resizeBorderCanvas();
+    startWaveBorder();
     updateDynamicReadouts();
     recordVisitorCount();
     if (announce) {
@@ -1383,22 +1519,24 @@ function startRealityWarp() {
     document.body.classList.toggle("mac-warping", isSystemOneTheme());
     document.body.classList.toggle("dos-warping", isDosTheme());
     document.body.classList.toggle("c64-warping", isC64Theme());
-    borderBoost = isSystemOneTheme() ? 58 : (isDosTheme() ? 74 : (isC64Theme() ? 88 : 62));
-    addLine(isSystemOneTheme() ? "System Error: Finder warp." : (isDosTheme() ? "DEBUG C:\\SQUINKY\\WARP.COM" : (isC64Theme() ? "POKE 53281,0" : "SQUINK WARP STARTED.")));
-    addLine(isSystemOneTheme() ? "Bomb dialog displayed." : (isDosTheme() ? "-G=CS:0100" : (isC64Theme() ? "SYS 49152" : "TIME-WARP AUDIO ACTIVE.")));
-    addLine(isSystemOneTheme() ? "Click Restart to continue." : (isDosTheme() ? "DISPLAY MODE 03H SHIFT ACTIVE." : (isC64Theme() ? "RUNNING COLOR RAM WARP." : "DISPLAY SHIFT ACTIVE.")));
+    document.body.classList.toggle("web-warping", isEmojiWebTheme());
+    document.body.classList.toggle("concord-warping", isConcordTheme());
+    borderBoost = isSystemOneTheme() ? 58 : (isDosTheme() ? 74 : (isC64Theme() ? 88 : (isEmojiWebTheme() ? 96 : (isConcordTheme() ? 44 : 62))));
+    addLine(isSystemOneTheme() ? "System Error: Finder warp." : (isDosTheme() ? "DEBUG C:\\SQUINKY\\WARP.COM" : (isC64Theme() ? "POKE 53281,0" : (isEmojiWebTheme() ? "WEB SURF WARP: HYPERLINK STORM." : (isConcordTheme() ? "CONCORD FLIGHT PATH BENDING." : "SQUINK WARP STARTED.")))));
+    addLine(isSystemOneTheme() ? "Bomb dialog displayed." : (isDosTheme() ? "-G=CS:0100" : (isC64Theme() ? "SYS 49152" : (isEmojiWebTheme() ? "NETSCAPE STARFIELD OVERDRIVE." : (isConcordTheme() ? "MACH READOUTS UNSTABLE." : "TIME-WARP AUDIO ACTIVE.")))));
+    addLine(isSystemOneTheme() ? "Click Restart to continue." : (isDosTheme() ? "DISPLAY MODE 03H SHIFT ACTIVE." : (isC64Theme() ? "RUNNING COLOR RAM WARP." : (isEmojiWebTheme() ? "PLEASE ENJOY THE OLD INTERNET." : (isConcordTheme() ? "CABIN LIGHTS DIMMED." : "DISPLAY SHIFT ACTIVE.")))));
     for (let i = 0; i < 8; i++) setTimeout(makeSquinkNote, i * 150);
     warpTimer = setTimeout(function() {
-        document.body.classList.remove("warping", "c64-warping", "dos-warping", "mac-warping");
+        document.body.classList.remove("warping", "c64-warping", "dos-warping", "mac-warping", "web-warping", "concord-warping");
         borderBoost = 32;
-        addLine(isSystemOneTheme() ? "Finder recovered." : (isDosTheme() ? "PROGRAM TERMINATED NORMALLY." : (isC64Theme() ? "READY." : "SQUINK WARP COMPLETE.")));
+        addLine(isSystemOneTheme() ? "Finder recovered." : (isDosTheme() ? "PROGRAM TERMINATED NORMALLY." : (isC64Theme() ? "READY." : (isEmojiWebTheme() ? "WEB SURF COMPLETE." : (isConcordTheme() ? "CONCORD LEVEL FLIGHT RESTORED." : "SQUINK WARP COMPLETE.")))));
     }, 4200);
 }
 
 function makeSquinkNote() {
     const note = document.createElement("div");
     note.className = "squink-note";
-    const texts = isSystemOneTheme() ? ["Finder", "Sound", "Disk", "System", "Special", "Desk", "File", "Restart"] : (isDosTheme() ? ["DIR", "CD", "EXE", "BAT", "SYS", "MEM", "CHKDSK", "PROMPT"] : (isC64Theme() ? ["POKE", "RUN", "LOAD", "SYS", "READY", "DATA", "GOTO", "64K"] : ["signal", "file", "green", "saved", "sync", "shift", "loop", "time"]));
+    const texts = isSystemOneTheme() ? ["Finder", "Sound", "Disk", "System", "Special", "Desk", "File", "Restart"] : (isDosTheme() ? ["DIR", "CD", "EXE", "BAT", "SYS", "MEM", "CHKDSK", "PROMPT"] : (isC64Theme() ? ["POKE", "RUN", "LOAD", "SYS", "READY", "DATA", "GOTO", "64K"] : (isEmojiWebTheme() ? ["★", "WELCOME", "COOL SITE", "GIF", "REAL AUDIO", "UNDER CONSTRUCTION", "SIGN MY GUESTBOOK", "WOW"] : (isConcordTheme() ? ["MACH 2", "ALTITUDE", "CABIN", "SONIC", "ROUTE", "SKY", "RADAR", "FINAL"] : ["signal", "file", "green", "saved", "sync", "shift", "loop", "time"]))));
     note.textContent = texts[Math.floor(Math.random() * texts.length)];
     const rect = desktop.getBoundingClientRect();
     note.style.left = Math.floor(Math.random() * Math.max(100, rect.width - 120) + 25) + "px";
@@ -1683,12 +1821,24 @@ function stopMusic() {
 
 // Wave border visualizer
 function resizeBorderCanvas() {
+    const config = getWaveBorderConfig();
+    if (!config.visible) {
+        cachedBorderWidth = 0;
+        cachedBorderHeight = 0;
+        borderCanvas.width = 1;
+        borderCanvas.height = 1;
+        borderCanvas.style.width = "1px";
+        borderCanvas.style.height = "1px";
+        borderCtx.clearRect(0, 0, 1, 1);
+        return;
+    }
+
     const rect = wrap.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
 
     const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
-    const displayWidth = Math.round(rect.width + 68);
-    const displayHeight = Math.round(rect.height + 68);
+    const displayWidth = Math.round(config.fitViewport ? window.innerWidth : rect.width + 68);
+    const displayHeight = Math.round(config.fitViewport ? window.innerHeight : rect.height + 68);
 
     cachedBorderWidth = Math.round(displayWidth * pixelRatio);
     cachedBorderHeight = Math.round(displayHeight * pixelRatio);
@@ -1716,8 +1866,7 @@ function scheduleWaveBorder(delay) {
     }, delay);
 }
 
-function drawWaveLine(startX, startY, endX, endY, outwardX, outwardY, dataArray, offset, force) {
-    const points = window.innerWidth <= 820 ? 42 : 72;
+function drawWaveLine(startX, startY, endX, endY, outwardX, outwardY, dataArray, offset, force, points) {
     borderCtx.beginPath();
     for (let i = 0; i <= points; i++) {
         const t = i / points;
@@ -1736,8 +1885,10 @@ function drawWaveLine(startX, startY, endX, endY, outwardX, outwardY, dataArray,
 
 function drawWaveBorder() {
     animationFrame = null;
+    const config = getWaveBorderConfig();
 
     if (
+        !config.visible ||
         document.hidden ||
         isTerminated ||
         !startupScreen.classList.contains("hidden") ||
@@ -1760,14 +1911,14 @@ function drawWaveBorder() {
     const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
     const width = (cachedBorderWidth || borderCanvas.width) / pixelRatio;
     const height = (cachedBorderHeight || borderCanvas.height) / pixelRatio;
-    const padding = 28;
+    const padding = config.padding;
     borderCtx.clearRect(0, 0, width, height);
 
     if (!analyser || !isPlaying) {
-        borderCtx.strokeStyle = "rgba(77,255,223,0.75)";
-        borderCtx.lineWidth = 4;
-        borderCtx.shadowBlur = 16;
-        borderCtx.shadowColor = "#2cff6a";
+        borderCtx.strokeStyle = config.idleColor;
+        borderCtx.lineWidth = config.lineWidth;
+        borderCtx.shadowBlur = config.idleShadow;
+        borderCtx.shadowColor = config.shadowColor;
         borderCtx.strokeRect(padding, padding, width - padding * 2, height - padding * 2);
         borderCtx.shadowBlur = 0;
         scheduleWaveBorder(targetFrameMs);
@@ -1777,16 +1928,16 @@ function drawWaveBorder() {
     const bufferLength = analyser.fftSize;
     const dataArray = new Uint8Array(bufferLength);
     analyser.getByteTimeDomainData(dataArray);
-    borderCtx.lineWidth = 4;
-    borderCtx.strokeStyle = "#4dffdf";
-    borderCtx.shadowBlur = document.body.classList.contains("warping") ? 36 : 24;
-    borderCtx.shadowColor = "#2cff6a";
+    borderCtx.lineWidth = config.lineWidth;
+    borderCtx.strokeStyle = config.activeColor;
+    borderCtx.shadowBlur = document.body.classList.contains("warping") ? config.activeShadow * 1.5 : config.activeShadow;
+    borderCtx.shadowColor = config.shadowColor;
     borderCtx.lineCap = "round";
     borderCtx.lineJoin = "round";
-    drawWaveLine(padding, padding, width - padding, padding, 0, -1, dataArray, 0, borderBoost);
-    drawWaveLine(width - padding, padding, width - padding, height - padding, 1, 0, dataArray, 128, borderBoost);
-    drawWaveLine(width - padding, height - padding, padding, height - padding, 0, 1, dataArray, 256, borderBoost);
-    drawWaveLine(padding, height - padding, padding, padding, -1, 0, dataArray, 384, borderBoost);
+    drawWaveLine(padding, padding, width - padding, padding, 0, -1, dataArray, 0, borderBoost, config.points);
+    drawWaveLine(width - padding, padding, width - padding, height - padding, 1, 0, dataArray, 128, borderBoost, config.points);
+    drawWaveLine(width - padding, height - padding, padding, height - padding, 0, 1, dataArray, 256, borderBoost, config.points);
+    drawWaveLine(padding, height - padding, padding, padding, -1, 0, dataArray, 384, borderBoost, config.points);
     borderCtx.shadowBlur = 0;
     scheduleWaveBorder(targetFrameMs);
 }

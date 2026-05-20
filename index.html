@@ -68,7 +68,7 @@
             <h1 id="logo"></h1>
             <div class="subtitle">Running squinkyDOS from an old personal web computer.</div>
             <div class="web-homepage-copy">
-                <p>You have arrived at Squinky World, a tiny web planet orbiting squinky.dev.</p>
+                <p>You have arrived at squinky.net, home of Squinky World, a tiny web planet orbiting squinky.dev.</p>
                 <div class="web-rainbow-rule"></div>
                 <div class="web-song-box">
                     <span>REAL AUDIO SPACE SONG</span>
@@ -93,6 +93,19 @@
                 <button class="os-button danger-button" id="terminateButton">TERMINATE OS</button>
             </div>
             <div class="theme-tray" id="themeTray" aria-label="Theme choices"></div>
+            <div class="web-portal">
+                <div class="web-starbar">☀ ★ ✨ Welcome To... ✨ ★ ☀</div>
+                <div class="web-portal-title">SQUINKY WORLD</div>
+                <div class="web-planet-row"><span>🪐</span><span>🌎</span><span>💿</span><span>⭐</span><span>🌙</span></div>
+                <p>You are now surfing a handmade homepage from the old internet. Please turn on your speakers, sign the guestbook, and enjoy the strange little web disk.</p>
+                <div class="web-link-grid">
+                    <button class="web-link" data-page="videosPage">📺 Video Portal</button>
+                    <button class="web-link" data-page="galleryPage">🖼️ GIF + Mod Gallery</button>
+                    <button class="web-link" data-page="guestbookPage">📝 Sign Guestbook</button>
+                    <button class="web-link" id="webSongButton" type="button">🔊 RealAudio Song</button>
+                </div>
+                <div class="web-under-construction">🚧 This page is always under construction 🚧</div>
+            </div>
         </section>
 
         <section class="icon-row">
@@ -102,6 +115,7 @@
             <div class="desktop-icon" data-window="terminalWindow"><div class="icon-art note"></div><div class="icon-label">terminal</div></div>
             <div class="desktop-icon" data-window="aboutWindow"><div class="icon-art folder"></div><div class="icon-label">about</div></div>
             <div class="desktop-icon" data-window="fileWindow"><div class="icon-art disk"></div><div class="icon-label">local disk</div></div>
+            <div class="desktop-icon mac-only" data-window="paintWindow"><div class="icon-art paint-icon"></div><div class="icon-label">paint</div></div>
             <div class="desktop-icon" data-page="videosPage"><div class="icon-art video"></div><div class="icon-label">all videos</div></div>
             <div class="desktop-icon" data-page="galleryPage"><div class="icon-art folder"></div><div class="icon-label">mod gallery</div></div>
             <div class="desktop-icon" data-page="guestbookPage"><div class="icon-art note"></div><div class="icon-label">guestbook</div></div>
@@ -179,6 +193,22 @@
                         <iframe src="https://giphy.com/embed/DfkYBNcvSqteKODUNz" title="Pikachu GIF by Pokemon" loading="lazy" allowfullscreen></iframe>
                         <div class="gif-caption">POKEMON WEB CHARM</div>
                     </div>
+                </div>
+            </article>
+
+            <article class="window mac-only" id="paintWindow">
+                <div class="titlebar">
+                    <span>MACPAINT_SKETCH</span>
+                    <span class="window-buttons"><button class="fake-button green" type="button" data-window-action="focus" aria-label="Focus window"></button><button class="fake-button blue" type="button" data-window-action="minimize" aria-label="Collapse window"></button><button class="fake-button" type="button" data-window-action="close" aria-label="Close window"></button></span>
+                </div>
+                <div class="window-content">
+                    <h2>MacPaint</h2>
+                    <div class="paint-toolbar">
+                        <button class="os-button paint-tool active" type="button" data-paint-size="2">Pencil</button>
+                        <button class="os-button paint-tool" type="button" data-paint-size="8">Brush</button>
+                        <button class="os-button" type="button" id="clearPaintButton">Clear</button>
+                    </div>
+                    <canvas id="paintCanvas" width="520" height="260" aria-label="Drawing canvas"></canvas>
                 </div>
             </article>
 
@@ -265,6 +295,7 @@
             <button class="task-button" data-window="terminalWindow">Terminal</button>
             <button class="task-button" data-window="aboutWindow">About</button>
             <button class="task-button" data-window="fileWindow">Local Disk</button>
+            <button class="task-button mac-only" data-window="paintWindow">Paint</button>
             <button class="task-button" data-page="videosPage">All Videos</button>
             <button class="task-button" data-page="galleryPage">Mod Gallery</button>
             <button class="task-button" data-page="guestbookPage">Guestbook</button>

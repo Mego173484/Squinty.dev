@@ -595,6 +595,11 @@ body.theme-msdos .startup-button {
     z-index: 0;
 }
 
+.web-portal,
+.mac-only {
+    display: none;
+}
+
 .desktop {
     position: relative;
     z-index: 1;
@@ -1115,6 +1120,55 @@ body.theme-system-one .taskbar {
     box-shadow: none;
 }
 
+body.theme-c64 #waveBorder,
+body.theme-msdos #waveBorder,
+body.theme-system-one #waveBorder {
+    display: none;
+}
+
+body.theme-system-one .mac-only {
+    display: flex;
+}
+
+body.theme-system-one article.mac-only {
+    display: block;
+}
+
+body.theme-system-one #terminalWindow,
+body.theme-system-one .desktop-icon[data-window="terminalWindow"],
+body.theme-system-one .task-button[data-window="terminalWindow"] {
+    display: none;
+}
+
+body.theme-system-one .paint-icon {
+    background:
+        linear-gradient(135deg, transparent 0 42%, #000000 42% 48%, transparent 48%),
+        linear-gradient(to bottom, #ffffff 0 22%, #000000 22% 28%, #ffffff 28%);
+}
+
+.paint-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.paint-tool.active {
+    filter: invert(1);
+}
+
+#paintCanvas {
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 2 / 1;
+    border: 2px solid #000000;
+    background: #ffffff;
+    image-rendering: pixelated;
+    cursor: crosshair;
+    touch-action: none;
+}
+
 body.theme-system-one .small-text,
 body.theme-system-one .footer {
     color: #333333;
@@ -1192,9 +1246,115 @@ body.theme-emoji-web .desktop {
 }
 
 body.theme-emoji-web #waveBorder {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
     display: block;
     opacity: 0.88;
     mix-blend-mode: screen;
+    z-index: 3;
+}
+
+body.theme-concord #waveBorder {
+    opacity: 0.64;
+    mix-blend-mode: screen;
+}
+
+body.theme-emoji-web .desktop {
+    width: min(1060px, 94vw);
+    margin: 0 auto;
+    padding: 0 0 30px;
+    overflow: visible;
+}
+
+body.theme-emoji-web .top-area {
+    min-height: 76vh;
+}
+
+body.theme-emoji-web .window-grid,
+body.theme-emoji-web .icon-row,
+body.theme-emoji-web .taskbar,
+body.theme-emoji-web #terminalWindow {
+    display: none;
+}
+
+body.theme-emoji-web .control-row,
+body.theme-emoji-web .theme-tray {
+    justify-content: center;
+}
+
+body.theme-emoji-web .web-portal {
+    display: block;
+    max-width: 760px;
+    margin: 18px auto 0;
+    padding: 10px;
+    color: #fff200;
+    text-align: center;
+    background:
+        radial-gradient(circle at 20% 18%, rgba(255,255,255,0.22) 0 2px, transparent 3px),
+        radial-gradient(circle at 76% 35%, rgba(255,255,255,0.2) 0 2px, transparent 3px),
+        #000000;
+    border: 6px ridge #c0c0c0;
+    box-shadow: 0 0 0 4px #000080, 0 0 28px #ff4df3;
+}
+
+body.theme-emoji-web .web-starbar {
+    color: #ffffff;
+    font: bold 22px Georgia, serif;
+    text-shadow: 3px 3px 0 #777777;
+}
+
+body.theme-emoji-web .web-portal-title {
+    margin: 4px 0 6px;
+    color: #ff5a7a;
+    font: bold clamp(42px, 8vw, 86px) Georgia, serif;
+    text-shadow: 3px 3px 0 #ffffff, 0 0 18px #ff4df3;
+}
+
+body.theme-emoji-web .web-planet-row {
+    display: flex;
+    justify-content: space-around;
+    font-size: clamp(28px, 6vw, 54px);
+    animation: webPlanetBob 2.6s steps(5, end) infinite alternate;
+}
+
+body.theme-emoji-web .web-portal p {
+    max-width: 620px;
+    margin: 12px auto;
+    color: #ffff99;
+    font: bold 18px Georgia, serif;
+    line-height: 1.45;
+    text-shadow: 1px 1px 0 #ff0000;
+}
+
+.web-link-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.web-link {
+    min-height: 44px;
+    border: 4px outset #ffffff;
+    background: linear-gradient(#fff200, #00ff66 48%, #ff4df3);
+    color: #000080;
+    font: bold 15px Arial, sans-serif;
+    cursor: pointer;
+}
+
+.web-link:active {
+    border-style: inset;
+}
+
+body.theme-emoji-web .web-under-construction {
+    margin-top: 12px;
+    padding: 6px;
+    color: #ff2600;
+    background: #fff200;
+    font: bold 18px "Comic Sans MS", "Comic Sans", cursive;
+    animation: webBlink 0.8s steps(2, end) infinite;
 }
 
 body.theme-emoji-web .desktop::before {
@@ -3368,6 +3528,33 @@ body.theme-system-one.mac-warping .desktop::after {
 body.theme-system-one.mac-warping .window,
 body.theme-system-one.mac-warping .desktop-icon {
     animation: macJitter 0.18s steps(2, end) infinite;
+}
+
+body.theme-emoji-web.web-warping .web-portal {
+    animation: webWarpSpin 0.42s steps(2, end) infinite alternate;
+}
+
+body.theme-emoji-web.web-warping .web-link {
+    animation: webBlink 0.18s steps(2, end) infinite;
+}
+
+body.theme-concord.concord-warping .desktop {
+    animation: concordBank 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes webPlanetBob {
+    from { transform: translateY(0); }
+    to { transform: translateY(-8px); }
+}
+
+@keyframes webWarpSpin {
+    from { transform: rotate(-1.5deg) scale(1.01); filter: hue-rotate(0deg) saturate(1.4); }
+    to { transform: rotate(1.5deg) scale(1.035); filter: hue-rotate(80deg) saturate(2); }
+}
+
+@keyframes concordBank {
+    from { transform: perspective(900px) rotateX(1deg) rotateZ(-1deg); filter: saturate(1.05); }
+    to { transform: perspective(900px) rotateX(-1deg) rotateZ(1deg); filter: saturate(1.35) brightness(1.08); }
 }
 
 @keyframes macJitter {
