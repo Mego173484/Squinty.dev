@@ -93,6 +93,38 @@
                 <button class="os-button danger-button" id="terminateButton">TERMINATE OS</button>
             </div>
             <div class="theme-tray" id="themeTray" aria-label="Theme choices"></div>
+            <div class="mode-feature signal-lab">
+                <div class="mode-title">SIGNAL LAB</div>
+                <p>Scan the old web disk and tune a green channel.</p>
+                <div class="signal-grid">
+                    <button class="signal-pad" type="button" data-signal-pad="video">VIDEO</button>
+                    <button class="signal-pad" type="button" data-signal-pad="mod">MOD</button>
+                    <button class="signal-pad" type="button" data-signal-pad="music">MUSIC</button>
+                </div>
+                <button class="os-button" id="signalScanButton" type="button">SCAN SIGNAL</button>
+                <div class="mode-output" id="signalLabOutput">SIGNAL IDLE. PICK A CHANNEL.</div>
+            </div>
+            <div class="mode-feature c64-station">
+                <div class="mode-title">**** SQUINKY 64 BASIC ****</div>
+                <pre class="basic-listing">10 PRINT "SQUINKY DISK"
+20 LOAD "SIGNALS",8
+30 POKE 53280,6
+40 RUN MOD TRACKER</pre>
+                <div class="c64-sprite-row" id="c64Sprites"><span></span><span></span><span></span><span></span></div>
+                <button class="os-button" id="c64RunButton" type="button">RUN PROGRAM</button>
+                <div class="mode-output" id="c64Output">READY.</div>
+            </div>
+            <div class="mode-feature concord-console">
+                <div class="mode-title">CONCORD FLIGHT DESK</div>
+                <div class="concord-window-row"><span></span><span></span><span></span><span></span><span></span></div>
+                <div class="concord-gauges">
+                    <div><strong id="concordMach">MACH 2.02</strong><span>SPEED</span></div>
+                    <div><strong id="concordAlt">58,000 FT</strong><span>ALTITUDE</span></div>
+                    <div><strong id="concordCabin">CALM</strong><span>CABIN</span></div>
+                </div>
+                <button class="os-button" id="concordRouteButton" type="button">PLOT ROUTE</button>
+                <div class="mode-output" id="concordOutput">LONDON -> NEW YORK. CRUISE STABLE.</div>
+            </div>
             <div class="web-portal">
                 <div class="web-starbar">☀ ★ ✨ Welcome To... ✨ ★ ☀</div>
                 <div class="web-portal-title">SQUINKY WORLD</div>
@@ -245,6 +277,7 @@
                         <li><button class="file-row" type="button" data-file="MOD"><span>MOD</span><span class="file-type">DIR</span></button></li>
                         <li><button class="file-row" type="button" data-file="VIDEO"><span>VIDEO</span><span class="file-type">DIR</span></button></li>
                         <li><button class="file-row" type="button" data-file="MUSIC"><span>MUSIC</span><span class="file-type">DIR</span></button></li>
+                        <li><button class="file-row" type="button" data-file="PAINT"><span>PAINT</span><span class="file-type">APP</span></button></li>
                         <li><button class="file-row" type="button" data-file="SIGNALS"><span>SIGNALS</span><span class="file-type">DIR</span></button></li>
                         <li><button class="file-row" type="button" data-file="GUESTBOOK"><span>GUESTBOOK.TXT</span><span class="file-type">TXT</span></button></li>
                         <li><button class="file-row" type="button" data-file="README"><span>README.TXT</span><span class="file-type">TXT</span></button></li>

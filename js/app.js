@@ -245,6 +245,17 @@ const trackDetails = document.getElementById("trackDetails");
 const musicWindowTitle = document.getElementById("musicWindowTitle");
 const musicHeading = document.getElementById("musicHeading");
 const webSongButton = document.getElementById("webSongButton");
+const signalScanButton = document.getElementById("signalScanButton");
+const signalLabOutput = document.getElementById("signalLabOutput");
+const signalPads = document.querySelectorAll("[data-signal-pad]");
+const c64RunButton = document.getElementById("c64RunButton");
+const c64Output = document.getElementById("c64Output");
+const c64Sprites = document.getElementById("c64Sprites");
+const concordRouteButton = document.getElementById("concordRouteButton");
+const concordMach = document.getElementById("concordMach");
+const concordAlt = document.getElementById("concordAlt");
+const concordCabin = document.getElementById("concordCabin");
+const concordOutput = document.getElementById("concordOutput");
 const paintCanvas = document.getElementById("paintCanvas");
 const clearPaintButton = document.getElementById("clearPaintButton");
 const paintTools = document.querySelectorAll("[data-paint-size]");
@@ -319,6 +330,15 @@ document.getElementById("colorButton").addEventListener("click", cycleTheme);
 document.getElementById("resetButton").addEventListener("click", resetOS);
 document.getElementById("terminateButton").addEventListener("click", terminateOS);
 if (webSongButton) webSongButton.addEventListener("click", toggleMusic);
+if (signalScanButton) signalScanButton.addEventListener("click", runSignalLabScan);
+if (c64RunButton) c64RunButton.addEventListener("click", runC64Program);
+if (concordRouteButton) concordRouteButton.addEventListener("click", plotConcordRoute);
+
+signalPads.forEach(function(button) {
+    button.addEventListener("click", function() {
+        tuneSignalPad(button.dataset.signalPad);
+    });
+});
 
 logoLetters.forEach(function(letter, index) {
     letter.addEventListener("click", function() { playLogoKey(index); });
@@ -861,6 +881,78 @@ function shuffleArray(items) {
     return copy;
 }
 
+// Theme-specific toys
+function tuneSignalPad(channel) {
+    if (!signalLabOutput) return;
+    const messages = {
+        video: "VIDEO CHANNEL LOCKED. LATEST_UPLOAD.URL IS HUMMING.",
+        mod: "MOD CHANNEL LOCKED. FALLEN GRACE SIGNAL IS FAINT BUT STABLE.",
+        music: "MUSIC CHANNEL LOCKED. PRESS START MUSIC FOR A LOOP."
+    };
+    signalLabOutput.textContent = messages[channel] || "UNKNOWN CHANNEL.";
+    playAssetSound("blip", 0.16);
+    if (channel === "video") focusWindow("videoWindow");
+    if (channel === "mod") focusWindow("modWindow");
+    if (channel === "music") focusWindow("musicWindow");
+}
+
+function runSignalLabScan() {
+    if (!signalLabOutput) return;
+    const signal = randomInt(62, 99);
+    const themeMessages = [
+        "GREEN-BLUE GRID FOUND A CLEAN VISITOR PULSE.",
+        "SAINT GLOW FOUND A SOFT GREEN ECHO.",
+        "COLD TERMINAL FOUND A FROSTED DATA CHANNEL.",
+        "ODD FILE FOUND A MISLABELED BUT FRIENDLY PACKET."
+    ];
+    const themeMessage = themeMessages[themeIndex] || "GREEN CHANNEL FOUND.";
+    signalLabOutput.textContent = "SCANNING...";
+    playTimedAssetSound("keyboard", 0.08, 360);
+
+    setTimeout(function() {
+        signalLabOutput.textContent = themeMessage + " SIGNAL " + signal + "%. VISITOR CACHE, MOD DISK, AND MUSIC DRIVER FOUND.";
+        triggerGlowBurst();
+    }, 420);
+}
+
+function runC64Program() {
+    if (!c64Output || !c64Sprites) return;
+    const sprites = ["◆", "●", "■", "▲", "★", "◇"];
+    const spriteNodes = c64Sprites.querySelectorAll("span");
+    c64Output.textContent = "SEARCHING FOR SIGNALS...";
+    playTimedAssetSound("keyboard", 0.1, 520);
+
+    spriteNodes.forEach(function(node, index) {
+        node.textContent = sprites[(index + randomInt(0, sprites.length - 1)) % sprites.length];
+        node.style.transform = "translateY(" + randomInt(-6, 6) + "px)";
+    });
+
+    setTimeout(function() {
+        c64Output.textContent = "READY. " + randomInt(8, 64) + " BLOCKS LOADED. SID VOICE " + randomInt(1, 3) + " ACTIVE.";
+        addLine("C64 BASIC PROGRAM RAN.");
+    }, 620);
+}
+
+function plotConcordRoute() {
+    if (!concordOutput) return;
+    const routes = [
+        ["LONDON -> NEW YORK", "MACH 2.02", "58,000 FT", "CALM"],
+        ["PARIS -> RIO", "MACH 1.94", "55,500 FT", "DINNER"],
+        ["BAHRAIN -> SINGAPORE", "MACH 2.04", "57,200 FT", "NIGHT"],
+        ["SQUINKY AIR TEST", "MACH 2.17", "60,000 FT", "SPARKLE"]
+    ];
+    const route = routes[randomInt(0, routes.length - 1)];
+    concordMach.textContent = route[1];
+    concordAlt.textContent = route[2];
+    concordCabin.textContent = route[3];
+    concordOutput.textContent = route[0] + ". SUPERSONIC ROUTE PLOTTED.";
+    playAssetSound("happy", 0.2);
+    document.body.classList.add("concord-route-pulse");
+    setTimeout(function() {
+        document.body.classList.remove("concord-route-pulse");
+    }, 1200);
+}
+
 // Tiny System 1 drawing app
 function clearPaintCanvas() {
     if (!paintCanvas || !paintCtx) return;
@@ -1060,6 +1152,11 @@ function openFile(fileName) {
             setFilePreview("MUSIC/: square synth loop and vinyl animation are ready.");
             focusWindow("musicWindow");
             addLine("A:/MUSIC OPENED. MUSIC_PLAYER.EXE FOCUSED.");
+        },
+        PAINT: function() {
+            setFilePreview("PAINT: MacPaint sketch pad opened.");
+            focusWindow("paintWindow");
+            addLine("PAINT OPENED. DRAWING SURFACE READY.");
         },
         SIGNALS: function() {
             setFilePreview("SIGNALS/: green signal steady. Iterator link unstable, harmless, and slightly warm.");
@@ -1435,6 +1532,12 @@ function syncThemeSurface() {
             win.classList.remove("active", "minimized");
             win.classList.add("hidden-window");
         });
+        const finderWindow = document.getElementById("fileWindow");
+        if (finderWindow) {
+            finderWindow.classList.remove("hidden-window", "minimized");
+            finderWindow.classList.add("active");
+        }
+        setFilePreview("System 1.0 disk: open a file or app icon from this Finder window.");
         return;
     }
 
