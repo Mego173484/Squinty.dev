@@ -1202,14 +1202,14 @@ function getWaveBorderConfig() {
         return {
             visible: true,
             fitViewport: true,
-            idleColor: "rgba(255, 242, 0, 0.86)",
-            activeColor: "#ff4df3",
+            idleColor: "rgba(255, 77, 243, 0.22)",
+            activeColor: "rgba(255, 77, 243, 0.46)",
             shadowColor: "#2fffff",
-            lineWidth: 6,
-            padding: 20,
-            points: window.innerWidth <= 820 ? 36 : 58,
-            idleShadow: 10,
-            activeShadow: 18
+            lineWidth: 3,
+            padding: 34,
+            points: window.innerWidth <= 820 ? 28 : 42,
+            idleShadow: 8,
+            activeShadow: 12
         };
     }
 
@@ -1427,6 +1427,22 @@ function syncThemeCopy() {
     }
 }
 
+function syncThemeSurface() {
+    const windows = document.querySelectorAll(".window");
+
+    if (isSystemOneTheme()) {
+        windows.forEach(function(win) {
+            win.classList.remove("active", "minimized");
+            win.classList.add("hidden-window");
+        });
+        return;
+    }
+
+    windows.forEach(function(win) {
+        win.classList.remove("hidden-window", "minimized");
+    });
+}
+
 function setTheme(index, announce) {
     themeIndex = index;
     const theme = themes[themeIndex];
@@ -1445,6 +1461,7 @@ function setTheme(index, announce) {
     });
     paletteReadout.textContent = "PALETTE: " + theme.name + " [" + (themeIndex + 1) + "/" + themes.length + "]";
     syncThemeCopy();
+    syncThemeSurface();
     resizeBorderCanvas();
     startWaveBorder();
     updateDynamicReadouts();

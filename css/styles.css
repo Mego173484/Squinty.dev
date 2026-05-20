@@ -988,21 +988,56 @@ body.theme-system-one .page-shell {
     animation: none;
 }
 
+body.theme-system-one .desktop-wrap {
+    width: min(1120px, 96vw);
+    margin-top: 18px;
+}
+
+body.theme-system-one .desktop {
+    min-height: 720px;
+    padding: 28px;
+    overflow: visible;
+}
+
 body.theme-system-one .top-area {
-    border: 1px solid #000000;
-    background: #ffffff;
+    min-height: 0;
+    margin: -28px -28px 22px;
+    padding: 0;
+    border: 0;
+    background: transparent;
 }
 
 body.theme-system-one .top-area::before {
     content: "  File   Edit   View   Special";
     display: block;
-    margin: -8px -8px 12px -8px;
+    margin: 0;
     padding: 4px 8px;
     background: #ffffff;
     border-bottom: 2px solid #000000;
     color: #000000;
     text-align: left;
     font-weight: bold;
+}
+
+body.theme-system-one #logo,
+body.theme-system-one .subtitle,
+body.theme-system-one .web-homepage-copy,
+body.theme-system-one .os-readout,
+body.theme-system-one .palette-readout,
+body.theme-system-one .splash-readout,
+body.theme-system-one .dynamic-readouts,
+body.theme-system-one .theme-flash {
+    display: none;
+}
+
+body.theme-system-one .control-row,
+body.theme-system-one .theme-tray {
+    max-width: 760px;
+    margin: 10px auto 0;
+    padding: 8px;
+    background: #ffffff;
+    border: 2px solid #000000;
+    justify-content: center;
 }
 
 body.theme-system-one h1,
@@ -1115,9 +1150,7 @@ body.theme-system-one .guestbook-form textarea {
 }
 
 body.theme-system-one .taskbar {
-    background: #ffffff;
-    border: 2px solid #000000;
-    box-shadow: none;
+    display: none;
 }
 
 body.theme-c64 #waveBorder,
@@ -1136,8 +1169,51 @@ body.theme-system-one article.mac-only {
 
 body.theme-system-one #terminalWindow,
 body.theme-system-one .desktop-icon[data-window="terminalWindow"],
-body.theme-system-one .task-button[data-window="terminalWindow"] {
+body.theme-system-one .task-button[data-window="terminalWindow"],
+body.theme-system-one .desktop-icon[data-page],
+body.theme-system-one .task-button[data-page] {
     display: none;
+}
+
+body.theme-system-one .icon-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(84px, 96px));
+    align-items: start;
+    justify-content: start;
+    gap: 18px;
+    margin: 24px 0;
+}
+
+body.theme-system-one .desktop-icon[data-window="fileWindow"] .icon-label {
+    font-size: 0;
+}
+
+body.theme-system-one .desktop-icon[data-window="fileWindow"] .icon-label::after {
+    content: "Finder";
+    font-size: 13px;
+}
+
+body.theme-system-one .window-grid {
+    display: block;
+}
+
+body.theme-system-one .window {
+    display: none;
+    max-width: 720px;
+    margin: 20px auto;
+}
+
+body.theme-system-one .window.active {
+    display: block;
+}
+
+body.theme-system-one #fileWindow .titlebar span:first-child {
+    font-size: 0;
+}
+
+body.theme-system-one #fileWindow .titlebar span:first-child::after {
+    content: "Finder - squinky.dev";
+    font-size: 14px;
 }
 
 body.theme-system-one .paint-icon {
@@ -1251,9 +1327,9 @@ body.theme-emoji-web #waveBorder {
     width: 100vw;
     height: 100vh;
     display: block;
-    opacity: 0.88;
+    opacity: 0.48;
     mix-blend-mode: screen;
-    z-index: 3;
+    z-index: 0;
 }
 
 body.theme-concord #waveBorder {
